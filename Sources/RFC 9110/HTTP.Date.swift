@@ -185,3 +185,21 @@ extension RFC_9110.Date: Comparable {
         lhs.date < rhs.date
     }
 }
+
+// MARK: - Foundation.Date Conversion
+
+extension Foundation.Date {
+    /// Creates a Foundation Date from an HTTP Date
+    ///
+    /// - Parameter httpDate: The HTTP date to convert
+    ///
+    /// # Example
+    ///
+    /// ```swift
+    /// let httpDate = HTTP.Date(Date())
+    /// let date = Date(httpDate)  // Bidirectional conversion
+    /// ```
+    public init(_ httpDate: RFC_9110.Date) {
+        self = httpDate.date
+    }
+}

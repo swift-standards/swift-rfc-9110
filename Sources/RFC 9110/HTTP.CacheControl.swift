@@ -308,3 +308,24 @@ extension RFC_9110.CacheControl: Codable {
         try container.encode(headerValue)
     }
 }
+
+// MARK: - ExpressibleByStringLiteral
+
+extension RFC_9110.CacheControl: ExpressibleByStringLiteral {
+    /// Creates a cache control directive from a string literal
+    ///
+    /// - Parameter value: The Cache-Control header value
+    ///
+    /// # Example
+    ///
+    /// ```swift
+    /// let cc: HTTP.CacheControl = "public, max-age=3600, must-revalidate"
+    /// ```
+    ///
+    /// # Note
+    ///
+    /// This uses the `parse()` method, which ignores unknown directives.
+    public init(stringLiteral value: String) {
+        self = Self.parse(value)
+    }
+}

@@ -71,6 +71,39 @@ extension RFC_9110.ContentNegotiation {
     }
 }
 
+// MARK: - QualityValue Numeric Literals
+
+extension RFC_9110.ContentNegotiation.QualityValue: ExpressibleByFloatLiteral {
+    /// Creates a quality value from a floating-point literal
+    ///
+    /// - Parameter value: The floating-point literal (0.0 to 1.0)
+    ///
+    /// # Example
+    ///
+    /// ```swift
+    /// let q: HTTP.ContentNegotiation.QualityValue = 0.8
+    /// ```
+    public init(floatLiteral value: Double) {
+        self.init(value)
+    }
+}
+
+extension RFC_9110.ContentNegotiation.QualityValue: ExpressibleByIntegerLiteral {
+    /// Creates a quality value from an integer literal
+    ///
+    /// - Parameter value: The integer literal (typically 0 or 1)
+    ///
+    /// # Example
+    ///
+    /// ```swift
+    /// let full: HTTP.ContentNegotiation.QualityValue = 1
+    /// let none: HTTP.ContentNegotiation.QualityValue = 0
+    /// ```
+    public init(integerLiteral value: Int) {
+        self.init(Double(value))
+    }
+}
+
 // MARK: - Media Type Preference
 
 extension RFC_9110.ContentNegotiation {
