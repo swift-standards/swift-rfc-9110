@@ -84,12 +84,12 @@ struct HTTPRequestTargetTests {
     }
 }
 
-@Suite("HTTP.Request.Message Tests")
+@Suite("HTTP.Request Tests")
 struct HTTPRequestMessageTests {
 
     @Test("Simple GET request")
     func simpleGetRequest() async throws {
-        let request = HTTP.Request.Message(
+        let request = HTTP.Request(
             method: .get,
             target: .origin(path: try .init("/users"), query: nil)
         )
@@ -103,7 +103,7 @@ struct HTTPRequestMessageTests {
     @Test("POST request with body and headers")
     func postRequestWithBody() async throws {
         let jsonData = Data("{\"name\":\"John\"}".utf8)
-        let request = try HTTP.Request.Message(
+        let request = try HTTP.Request(
             method: .post,
             target: .origin(path: .init("/users"), query: nil),
             headers: [
@@ -120,7 +120,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Convenience initializer with URI components")
     func convenienceInitializer() async throws {
-        let request = HTTP.Request.Message(
+        let request = HTTP.Request(
             method: .get,
             scheme: try .init("https"),
             host: try .init("api.example.com"),
@@ -137,7 +137,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Header accessors")
     func headerAccessors() async throws {
-        let request = try HTTP.Request.Message(
+        let request = try HTTP.Request(
             method: .get,
             target: .origin(path: .init("/"), query: nil),
             headers: [
@@ -161,7 +161,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Adding headers")
     func addingHeaders() async throws {
-        let request = HTTP.Request.Message(
+        let request = HTTP.Request(
             method: .get,
             target: .origin(path: try .init("/"), query: nil)
         )
@@ -176,7 +176,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Removing headers")
     func removingHeaders() async throws {
-        let request = try HTTP.Request.Message(
+        let request = try HTTP.Request(
             method: .get,
             target: .origin(path: .init("/"), query: nil),
             headers: [
@@ -194,7 +194,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Request validation - CONNECT with authority-form")
     func validationConnectAuthority() async throws {
-        let request = HTTP.Request.Message(
+        let request = HTTP.Request(
             method: .connect,
             target: .authority(
                 RFC_3986.URI.Authority(
@@ -210,7 +210,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Request validation - CONNECT with wrong target form")
     func validationConnectWrongTarget() async throws {
-        let request = HTTP.Request.Message(
+        let request = HTTP.Request(
             method: .connect,
             target: .origin(path: try .init("/"), query: nil)
         )
@@ -218,7 +218,7 @@ struct HTTPRequestMessageTests {
         do {
             try request.validate()
             Issue.record("Should have thrown validation error")
-        } catch let error as HTTP.Request.Message.ValidationError {
+        } catch let error as HTTP.Request.ValidationError {
             if case .invalidMethodForTarget = error {
                 // Expected
             } else {
@@ -229,7 +229,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Request validation - OPTIONS with asterisk-form")
     func validationOptionsAsterisk() async throws {
-        let request = HTTP.Request.Message(
+        let request = HTTP.Request(
             method: .options,
             target: .asterisk
         )
@@ -239,7 +239,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Request validation - OPTIONS with wrong target form")
     func validationOptionsWrongTarget() async throws {
-        let request = HTTP.Request.Message(
+        let request = HTTP.Request(
             method: .get,
             target: .asterisk
         )
@@ -247,7 +247,7 @@ struct HTTPRequestMessageTests {
         do {
             try request.validate()
             Issue.record("Should have thrown validation error")
-        } catch let error as HTTP.Request.Message.ValidationError {
+        } catch let error as HTTP.Request.ValidationError {
             if case .invalidMethodForTarget = error {
                 // Expected
             } else {
@@ -258,7 +258,7 @@ struct HTTPRequestMessageTests {
 
     @Test("Request codable")
     func requestCodable() async throws {
-        let request = try HTTP.Request.Message(
+        let request = try HTTP.Request(
             method: .post,
             target: .origin(path: .init("/users"), query: nil),
             headers: [
@@ -271,14 +271,14 @@ struct HTTPRequestMessageTests {
         let decoder = JSONDecoder()
 
         let encoded = try encoder.encode(request)
-        let decoded = try decoder.decode(HTTP.Request.Message.self, from: encoded)
+        let decoded = try decoder.decode(HTTP.Request.self, from: encoded)
 
         #expect(decoded == request)
     }
 
     @Test("Request description")
     func requestDescription() async throws {
-        let request = try HTTP.Request.Message(
+        let request = try HTTP.Request(
             method: .get,
             target: .origin(path: .init("/users"), query: .init("page=1")),
             headers: [

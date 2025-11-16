@@ -271,3 +271,286 @@ extension RFC_9110.ContentNegotiation.MediaTypePreference: CustomStringConvertib
         }
     }
 }
+
+// MARK: - Encoding Preference (Section 12.5.3)
+
+extension RFC_9110.ContentNegotiation {
+    /// Content encoding preference from Accept-Encoding header (RFC 9110 Section 12.5.3)
+    ///
+    /// Represents a content encoding with an optional quality value.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// Accept-Encoding: gzip;q=1.0, br;q=0.8, deflate;q=0.5
+    /// ```
+    ///
+    /// ## Reference
+    ///
+    /// - [RFC 9110 Section 12.5.3: Accept-Encoding](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.3)
+    public struct EncodingPreference: Sendable, Equatable {
+        /// The content encoding
+        public let encoding: RFC_9110.ContentEncoding
+        
+        /// The quality value (defaults to 1.0)
+        public let quality: QualityValue
+        
+        /// Creates an encoding preference
+        ///
+        /// - Parameters:
+        ///   - encoding: The content encoding
+        ///   - quality: The quality value (defaults to 1.0)
+        public init(encoding: RFC_9110.ContentEncoding, quality: QualityValue = .default) {
+            self.encoding = encoding
+            self.quality = quality
+        }
+        
+        /// Parses encoding preferences from an Accept-Encoding header value
+        ///
+        /// - Parameter headerValue: The Accept-Encoding header value
+        /// - Returns: An array of encoding preferences, sorted by quality (descending)
+        ///
+        /// ## Example
+        ///
+        /// ```swift
+        /// let prefs = HTTP.ContentNegotiation.EncodingPreference.parse(
+        ///     "gzip;q=1.0, br;q=0.8, deflate;q=0.5"
+        /// )
+        /// ```
+        public static func parse(_ headerValue: String) -> [EncodingPreference] {
+            let components = headerValue.components(separatedBy: ",")
+            var preferences: [EncodingPreference] = []
+            
+            for component in components {
+                let trimmed = component.trimmingCharacters(in: .whitespaces)
+                
+                // Split on semicolon to separate encoding from quality
+                let parts = trimmed.components(separatedBy: ";")
+                guard let encodingString = parts.first?.trimmingCharacters(in: .whitespaces),
+                      !encodingString.isEmpty else {
+                    continue
+                }
+                
+                let encoding = RFC_9110.ContentEncoding(encodingString)
+                
+                // Look for q parameter
+                var quality = QualityValue.default
+                for part in parts.dropFirst() {
+                    let param = part.trimmingCharacters(in: .whitespaces)
+                    if param.hasPrefix("q=") {
+                        let qValue = String(param.dropFirst(2))
+                        if let parsed = QualityValue.parse(qValue) {
+                            quality = parsed
+                        }
+                    }
+                }
+                
+                preferences.append(EncodingPreference(encoding: encoding, quality: quality))
+            }
+            
+            // Sort by quality (descending)
+            return preferences.sorted { $0.quality > $1.quality }
+        }
+    }
+}
+
+extension RFC_9110.ContentNegotiation.EncodingPreference: CustomStringConvertible {
+    public var description: String {
+        if quality == .default {
+            return encoding.value
+        } else {
+            return "\(encoding.value);q=\(quality)"
+        }
+    }
+}
+
+// MARK: - Language Preference (Section 12.5.4)
+
+extension RFC_9110.ContentNegotiation {
+    /// Language preference from Accept-Language header (RFC 9110 Section 12.5.4)
+    ///
+    /// Represents a language tag with an optional quality value.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// Accept-Language: en-US;q=1.0, fr;q=0.8, de;q=0.5
+    /// ```
+    ///
+    /// ## Reference
+    ///
+    /// - [RFC 9110 Section 12.5.4: Accept-Language](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.4)
+    public struct LanguagePreference: Sendable, Equatable {
+        /// The language tag (e.g., "en-US", "fr", "de")
+        public let language: String
+        
+        /// The quality value (defaults to 1.0)
+        public let quality: QualityValue
+        
+        /// Creates a language preference
+        ///
+        /// - Parameters:
+        ///   - language: The language tag
+        ///   - quality: The quality value (defaults to 1.0)
+        public init(language: String, quality: QualityValue = .default) {
+            self.language = language
+            self.quality = quality
+        }
+        
+        /// Parses language preferences from an Accept-Language header value
+        ///
+        /// - Parameter headerValue: The Accept-Language header value
+        /// - Returns: An array of language preferences, sorted by quality (descending)
+        ///
+        /// ## Example
+        ///
+        /// ```swift
+        /// let prefs = HTTP.ContentNegotiation.LanguagePreference.parse(
+        ///     "en-US;q=1.0, fr;q=0.8, *;q=0.1"
+        /// )
+        /// ```
+        public static func parse(_ headerValue: String) -> [LanguagePreference] {
+            let components = headerValue.components(separatedBy: ",")
+            var preferences: [LanguagePreference] = []
+            
+            for component in components {
+                let trimmed = component.trimmingCharacters(in: .whitespaces)
+                
+                // Split on semicolon to separate language from quality
+                let parts = trimmed.components(separatedBy: ";")
+                guard let language = parts.first?.trimmingCharacters(in: .whitespaces),
+                      !language.isEmpty else {
+                    continue
+                }
+                
+                // Look for q parameter
+                var quality = QualityValue.default
+                for part in parts.dropFirst() {
+                    let param = part.trimmingCharacters(in: .whitespaces)
+                    if param.hasPrefix("q=") {
+                        let qValue = String(param.dropFirst(2))
+                        if let parsed = QualityValue.parse(qValue) {
+                            quality = parsed
+                        }
+                    }
+                }
+                
+                preferences.append(LanguagePreference(language: language, quality: quality))
+            }
+            
+            // Sort by quality (descending), then by specificity
+            return preferences.sorted { lhs, rhs in
+                if lhs.quality.value != rhs.quality.value {
+                    return lhs.quality > rhs.quality
+                }
+                // More specific language tags come first (en-US before en)
+                return lhs.language.count > rhs.language.count
+            }
+        }
+    }
+}
+
+extension RFC_9110.ContentNegotiation.LanguagePreference: CustomStringConvertible {
+    public var description: String {
+        if quality == .default {
+            return language
+        } else {
+            return "\(language);q=\(quality)"
+        }
+    }
+}
+
+// MARK: - Charset Preference (Section 12.5.2)
+
+extension RFC_9110.ContentNegotiation {
+    /// Charset preference from Accept-Charset header (RFC 9110 Section 12.5.2)
+    ///
+    /// Represents a character encoding with an optional quality value.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// Accept-Charset: utf-8;q=1.0, iso-8859-1;q=0.5
+    /// ```
+    ///
+    /// ## Note
+    ///
+    /// Accept-Charset is rarely used in modern applications since UTF-8
+    /// has become the universal standard.
+    ///
+    /// ## Reference
+    ///
+    /// - [RFC 9110 Section 12.5.2: Accept-Charset](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.2)
+    public struct CharsetPreference: Sendable, Equatable {
+        /// The charset name (e.g., "utf-8", "iso-8859-1")
+        public let charset: String
+        
+        /// The quality value (defaults to 1.0)
+        public let quality: QualityValue
+        
+        /// Creates a charset preference
+        ///
+        /// - Parameters:
+        ///   - charset: The charset name
+        ///   - quality: The quality value (defaults to 1.0)
+        public init(charset: String, quality: QualityValue = .default) {
+            self.charset = charset.lowercased()
+            self.quality = quality
+        }
+        
+        /// Parses charset preferences from an Accept-Charset header value
+        ///
+        /// - Parameter headerValue: The Accept-Charset header value
+        /// - Returns: An array of charset preferences, sorted by quality (descending)
+        ///
+        /// ## Example
+        ///
+        /// ```swift
+        /// let prefs = HTTP.ContentNegotiation.CharsetPreference.parse(
+        ///     "utf-8;q=1.0, iso-8859-1;q=0.5"
+        /// )
+        /// ```
+        public static func parse(_ headerValue: String) -> [CharsetPreference] {
+            let components = headerValue.components(separatedBy: ",")
+            var preferences: [CharsetPreference] = []
+            
+            for component in components {
+                let trimmed = component.trimmingCharacters(in: .whitespaces)
+                
+                // Split on semicolon to separate charset from quality
+                let parts = trimmed.components(separatedBy: ";")
+                guard let charset = parts.first?.trimmingCharacters(in: .whitespaces),
+                      !charset.isEmpty else {
+                    continue
+                }
+                
+                // Look for q parameter
+                var quality = QualityValue.default
+                for part in parts.dropFirst() {
+                    let param = part.trimmingCharacters(in: .whitespaces)
+                    if param.hasPrefix("q=") {
+                        let qValue = String(param.dropFirst(2))
+                        if let parsed = QualityValue.parse(qValue) {
+                            quality = parsed
+                        }
+                    }
+                }
+                
+                preferences.append(CharsetPreference(charset: charset, quality: quality))
+            }
+            
+            // Sort by quality (descending)
+            return preferences.sorted { $0.quality > $1.quality }
+        }
+    }
+}
+
+extension RFC_9110.ContentNegotiation.CharsetPreference: CustomStringConvertible {
+    public var description: String {
+        if quality == .default {
+            return charset
+        } else {
+            return "\(charset);q=\(quality)"
+        }
+    }
+}

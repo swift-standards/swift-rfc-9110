@@ -10,11 +10,6 @@
 import Foundation
 
 extension RFC_9110 {
-    /// HTTP Response namespace
-    public enum Response {}
-}
-
-extension RFC_9110.Response {
     /// HTTP response message per RFC 9110 Section 15
     ///
     /// An HTTP response message consists of a status line (status code),
@@ -23,7 +18,7 @@ extension RFC_9110.Response {
     /// ## Example
     /// ```swift
     /// // Simple 200 OK response
-    /// let response = try HTTP.Response.Message(
+    /// let response = HTTP.Response(
     ///     status: .ok,
     ///     headers: [
     ///         .init(name: "Content-Type", value: "application/json")
@@ -32,7 +27,7 @@ extension RFC_9110.Response {
     /// )
     ///
     /// // 404 Not Found response
-    /// let notFound = try HTTP.Response.Message(
+    /// let notFound = HTTP.Response(
     ///     status: .notFound,
     ///     headers: [
     ///         .init(name: "Content-Type", value: "text/plain")
@@ -59,7 +54,7 @@ extension RFC_9110.Response {
     /// - [RFC 9110 Section 3: Message Format](https://www.rfc-editor.org/rfc/rfc9110.html#section-3)
     /// - [RFC 9110 Section 6: Message Abstraction](https://www.rfc-editor.org/rfc/rfc9110.html#section-6)
     /// - [RFC 9110 Section 15: Status Codes](https://www.rfc-editor.org/rfc/rfc9110.html#section-15)
-    public struct Message: Sendable, Equatable, Hashable {
+    public struct Response: Sendable, Equatable, Hashable {
         // MARK: - Status Line Components
 
         /// HTTP status code (required per RFC 9110 Section 15)
@@ -125,7 +120,7 @@ extension RFC_9110.Response {
         ///
         /// - Parameter field: The header field to add
         /// - Returns: A new response with the header field added
-        public func addingHeader(_ field: RFC_9110.Header.Field) -> Message {
+        public func addingHeader(_ field: RFC_9110.Header.Field) -> Response {
             var copy = self
             copy.headers.append(field)
             return copy
@@ -135,7 +130,7 @@ extension RFC_9110.Response {
         ///
         /// - Parameter name: The header field name to remove (case-insensitive)
         /// - Returns: A new response with the header fields removed
-        public func removingHeaders(_ name: RFC_9110.Header.Field.Name) -> Message {
+        public func removingHeaders(_ name: RFC_9110.Header.Field.Name) -> Response {
             var copy = self
             copy.headers.removeAll(named: name.rawValue)
             return copy
@@ -152,8 +147,8 @@ extension RFC_9110.Response {
         public static func ok(
             headers: RFC_9110.Headers = [],
             body: Data? = nil
-        ) -> Message {
-            Message(status: .ok, headers: headers, body: body)
+        ) -> Response {
+            Response(status: .ok, headers: headers, body: body)
         }
 
         /// Creates a 201 Created response
@@ -167,12 +162,12 @@ extension RFC_9110.Response {
             location: String? = nil,
             headers: RFC_9110.Headers = [],
             body: Data? = nil
-        ) throws -> Message {
+        ) throws -> Response {
             var responseHeaders = headers
             if let location = location {
                 responseHeaders.append(try .init(name: "Location", value: location))
             }
-            return Message(status: .created, headers: responseHeaders, body: body)
+            return Response(status: .created, headers: responseHeaders, body: body)
         }
 
         /// Creates a 204 No Content response
@@ -181,8 +176,8 @@ extension RFC_9110.Response {
         /// - Returns: A response with status 204 and no body
         public static func noContent(
             headers: RFC_9110.Headers = []
-        ) -> Message {
-            Message(status: .noContent, headers: headers, body: nil)
+        ) -> Response {
+            Response(status: .noContent, headers: headers, body: nil)
         }
 
         /// Creates a 301 Moved Permanently redirect response
@@ -194,10 +189,10 @@ extension RFC_9110.Response {
         public static func movedPermanently(
             to location: String,
             headers: RFC_9110.Headers = []
-        ) throws -> Message {
+        ) throws -> Response {
             var responseHeaders = headers
             responseHeaders.append(try .init(name: "Location", value: location))
-            return Message(status: .movedPermanently, headers: responseHeaders, body: nil)
+            return Response(status: .movedPermanently, headers: responseHeaders, body: nil)
         }
 
         /// Creates a 302 Found redirect response
@@ -209,10 +204,10 @@ extension RFC_9110.Response {
         public static func found(
             at location: String,
             headers: RFC_9110.Headers = []
-        ) throws -> Message {
+        ) throws -> Response {
             var responseHeaders = headers
             responseHeaders.append(try .init(name: "Location", value: location))
-            return Message(status: .found, headers: responseHeaders, body: nil)
+            return Response(status: .found, headers: responseHeaders, body: nil)
         }
 
         /// Creates a 303 See Other redirect response
@@ -224,10 +219,10 @@ extension RFC_9110.Response {
         public static func seeOther(
             at location: String,
             headers: RFC_9110.Headers = []
-        ) throws -> Message {
+        ) throws -> Response {
             var responseHeaders = headers
             responseHeaders.append(try .init(name: "Location", value: location))
-            return Message(status: .seeOther, headers: responseHeaders, body: nil)
+            return Response(status: .seeOther, headers: responseHeaders, body: nil)
         }
 
         /// Creates a 304 Not Modified response
@@ -236,8 +231,8 @@ extension RFC_9110.Response {
         /// - Returns: A response with status 304 and no body
         public static func notModified(
             headers: RFC_9110.Headers = []
-        ) -> Message {
-            Message(status: .notModified, headers: headers, body: nil)
+        ) -> Response {
+            Response(status: .notModified, headers: headers, body: nil)
         }
 
         /// Creates a 400 Bad Request response
@@ -249,8 +244,8 @@ extension RFC_9110.Response {
         public static func badRequest(
             headers: RFC_9110.Headers = [],
             body: Data? = nil
-        ) -> Message {
-            Message(status: .badRequest, headers: headers, body: body)
+        ) -> Response {
+            Response(status: .badRequest, headers: headers, body: body)
         }
 
         /// Creates a 401 Unauthorized response
@@ -264,10 +259,10 @@ extension RFC_9110.Response {
             wwwAuthenticate: String,
             headers: RFC_9110.Headers = [],
             body: Data? = nil
-        ) throws -> Message {
+        ) throws -> Response {
             var responseHeaders = headers
             responseHeaders.append(try .init(name: "WWW-Authenticate", value: wwwAuthenticate))
-            return Message(status: .unauthorized, headers: responseHeaders, body: body)
+            return Response(status: .unauthorized, headers: responseHeaders, body: body)
         }
 
         /// Creates a 403 Forbidden response
@@ -279,8 +274,8 @@ extension RFC_9110.Response {
         public static func forbidden(
             headers: RFC_9110.Headers = [],
             body: Data? = nil
-        ) -> Message {
-            Message(status: .forbidden, headers: headers, body: body)
+        ) -> Response {
+            Response(status: .forbidden, headers: headers, body: body)
         }
 
         /// Creates a 404 Not Found response
@@ -292,8 +287,8 @@ extension RFC_9110.Response {
         public static func notFound(
             headers: RFC_9110.Headers = [],
             body: Data? = nil
-        ) -> Message {
-            Message(status: .notFound, headers: headers, body: body)
+        ) -> Response {
+            Response(status: .notFound, headers: headers, body: body)
         }
 
         /// Creates a 500 Internal Server Error response
@@ -305,8 +300,8 @@ extension RFC_9110.Response {
         public static func internalServerError(
             headers: RFC_9110.Headers = [],
             body: Data? = nil
-        ) -> Message {
-            Message(status: .internalServerError, headers: headers, body: body)
+        ) -> Response {
+            Response(status: .internalServerError, headers: headers, body: body)
         }
 
         /// Creates a 503 Service Unavailable response
@@ -320,19 +315,19 @@ extension RFC_9110.Response {
             retryAfter: String? = nil,
             headers: RFC_9110.Headers = [],
             body: Data? = nil
-        ) throws -> Message {
+        ) throws -> Response {
             var responseHeaders = headers
             if let retryAfter = retryAfter {
                 responseHeaders.append(try .init(name: "Retry-After", value: retryAfter))
             }
-            return Message(status: .serviceUnavailable, headers: responseHeaders, body: body)
+            return Response(status: .serviceUnavailable, headers: responseHeaders, body: body)
         }
     }
 }
 
 // MARK: - Codable
 
-extension RFC_9110.Response.Message: Codable {
+extension RFC_9110.Response: Codable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let status = try container.decode(RFC_9110.Status.self, forKey: .status)
@@ -366,7 +361,7 @@ extension RFC_9110.Response.Message: Codable {
 
 // MARK: - CustomStringConvertible
 
-extension RFC_9110.Response.Message: CustomStringConvertible {
+extension RFC_9110.Response: CustomStringConvertible {
     /// Returns a string representation of the response
     ///
     /// Format: "STATUS_CODE Reason\nHeader: Value\n..."
