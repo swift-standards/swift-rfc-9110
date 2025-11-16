@@ -73,14 +73,37 @@ extension RFC_9110 {
             self.isCacheable = isCacheable
         }
 
-        /// Creates a method from a raw value with default properties
+        /// Creates a method from a raw value
         ///
-        /// For custom methods, assumes not safe, not idempotent, not cacheable
-        /// unless explicitly specified otherwise.
+        /// If the rawValue matches a standard method, returns that method with
+        /// its correct properties. Otherwise creates a custom method with
+        /// default properties (not safe, not idempotent, not cacheable).
         ///
         /// - Parameter rawValue: The method name (case-sensitive)
         public init(rawValue: String) {
-            self.init(rawValue, isSafe: false, isIdempotent: false, isCacheable: false)
+            switch rawValue {
+            case "GET":
+                self = .get
+            case "HEAD":
+                self = .head
+            case "POST":
+                self = .post
+            case "PUT":
+                self = .put
+            case "DELETE":
+                self = .delete
+            case "CONNECT":
+                self = .connect
+            case "OPTIONS":
+                self = .options
+            case "TRACE":
+                self = .trace
+            case "PATCH":
+                self = .patch
+            default:
+                // Custom method: defaults to unsafe, non-idempotent, non-cacheable
+                self.init(rawValue, isSafe: false, isIdempotent: false, isCacheable: false)
+            }
         }
 
         // MARK: - Standard Methods (RFC 9110 Section 9.3)
@@ -135,13 +158,19 @@ extension RFC_9110 {
         // MARK: - Equatable
 
         public static func == (lhs: Method, rhs: Method) -> Bool {
-            lhs.rawValue == rhs.rawValue
+            lhs.rawValue == rhs.rawValue &&
+            lhs.isSafe == rhs.isSafe &&
+            lhs.isIdempotent == rhs.isIdempotent &&
+            lhs.isCacheable == rhs.isCacheable
         }
 
         // MARK: - Hashable
 
         public func hash(into hasher: inout Hasher) {
             hasher.combine(rawValue)
+            hasher.combine(isSafe)
+            hasher.combine(isIdempotent)
+            hasher.combine(isCacheable)
         }
 
         // MARK: - Codable
