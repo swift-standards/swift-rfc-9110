@@ -10,7 +10,7 @@ RFC 9110 consolidates and updates the core HTTP specifications, providing a unif
 
 ## Status
 
-**Alpha** - Week 1 implementation complete
+**Alpha** - Week 1 & 2 implementation complete
 
 ### Implemented (Week 1)
 
@@ -24,9 +24,36 @@ RFC 9110 consolidates and updates the core HTTP specifications, providing a unif
   - Category checks: `isInformational`, `isSuccessful`, `isRedirection`, `isClientError`, `isServerError`
   - Full conformances: Sendable, Equatable, Hashable, Codable
 
+### Implemented (Week 2)
+
+- ✅ `HTTP.Header.Field` - HTTP header fields (Section 6.3)
+  - Name (case-insensitive) and Value (validated for security)
+  - CRLF injection prevention
+  - 40+ standard header name constants
+
+- ✅ `HTTP.Headers` - Header field collection
+  - Case-insensitive subscript access
+  - Multiple values per header name
+  - Preserves insertion order
+
+- ✅ `HTTP.Request.Target` - Request target forms (Section 7.1)
+  - origin-form (most common)
+  - absolute-form (for proxies)
+  - authority-form (for CONNECT)
+  - asterisk-form (for OPTIONS *)
+
+- ✅ `HTTP.Request.Message` - Complete HTTP request
+  - Method + Target + Headers + Body
+  - Request validation
+  - Convenience constructors
+
+- ✅ `HTTP.Response.Message` - Complete HTTP response
+  - Status + Headers + Body
+  - Convenience constructors (ok, created, notFound, etc.)
+  - Helper methods
+
 ### Planned
 
-- 📋 Week 2: `HTTP.Header`, `HTTP.Headers`, `HTTP.Request`, `HTTP.Response`, `HTTP.RequestTarget`
 - 📋 Week 3: `HTTP.MediaType`, `HTTP.ContentNegotiation`, `HTTP.Authentication`
 - 📋 Future: Additional semantics as needed
 
@@ -47,9 +74,25 @@ status.code           // 200
 status.isSuccessful   // true
 status.description    // "200 OK"
 
-// Custom values
-let customMethod = HTTP.Method("CUSTOM")
-let customStatus = HTTP.Status(418, "I'm a teapot")
+// Headers
+let headers = try HTTP.Headers([
+    .init(name: "Content-Type", value: "application/json"),
+    .init(name: "Accept", value: "application/json")
+])
+
+// Request
+let request = try HTTP.Request.Message(
+    method: .post,
+    target: .origin(path: .init("/api/users"), query: nil),
+    headers: headers,
+    body: Data(#"{"name":"John"}"#.utf8)
+)
+
+// Response with convenience constructor
+let response = try HTTP.Response.Message.created(
+    location: "/api/users/123",
+    body: Data(#"{"id":123,"name":"John"}"#.utf8)
+)
 ```
 
 ## Requirements
@@ -103,7 +146,7 @@ Following the established patterns from swift-rfc-7230/7231:
 swift test
 ```
 
-Current test coverage: 15 tests, all passing
+Current test coverage: 75 tests, all passing
 
 ## License
 
