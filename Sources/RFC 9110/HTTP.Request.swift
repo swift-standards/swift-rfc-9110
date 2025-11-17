@@ -59,7 +59,7 @@ extension RFC_9110 {
     /// - [RFC 9110 Section 3: Message Format](https://www.rfc-editor.org/rfc/rfc9110.html#section-3)
     /// - [RFC 9110 Section 7: Request Semantics](https://www.rfc-editor.org/rfc/rfc9110.html#section-7)
     /// - [RFC 9110 Section 9: Methods](https://www.rfc-editor.org/rfc/rfc9110.html#section-9)
-    public struct Request: Sendable, Equatable, Hashable {
+    public struct Request: Sendable, Equatable, Hashable, Codable {
         // MARK: - Request Line Components
 
         /// HTTP method (required per RFC 9110 Section 9)
@@ -231,11 +231,10 @@ extension RFC_9110 {
         /// Returns the scheme for absolute-form request targets.
         /// Returns nil for other forms (scheme comes from connection context).
         public var scheme: RFC_3986.URI.Scheme? {
-            guard case .absolute(let uri) = target,
-                  let schemeString = uri.scheme else {
+            guard case .absolute(let uri) = target else {
                 return nil
             }
-            return try? RFC_3986.URI.Scheme(schemeString)
+            return uri.scheme
         }
 
         /// Authority component from the request target, if applicable
@@ -246,15 +245,13 @@ extension RFC_9110 {
             switch target {
             case .absolute(let uri):
                 // Try to construct authority from URI components
-                guard let host = uri.host,
-                      let hostEnum = try? RFC_3986.URI.Host(host) else {
+                guard let host = uri.host else {
                     return nil
                 }
-                let port = uri.port.flatMap { UInt16(exactly: $0) }.map { RFC_3986.URI.Port($0) }
                 return RFC_3986.URI.Authority(
                     userinfo: uri.userinfo,
-                    host: hostEnum,
-                    port: port
+                    host: host,
+                    port: uri.port
                 )
             case .authority(let authority):
                 return authority
@@ -371,7 +368,7 @@ extension RFC_9110.Request {
     /// ## Reference
     ///
     /// - [RFC 9110 Section 7.1: Request Target](https://www.rfc-editor.org/rfc/rfc9110.html#section-7.1)
-    public enum Target: Sendable, Equatable, Hashable {
+    public enum Target: Sendable, Equatable, Hashable, Codable {
         /// origin-form: absolute-path [ "?" query ]
         ///
         /// The most common form of request-target, used in requests directly to an origin server.
@@ -486,11 +483,8 @@ extension RFC_9110.Request {
                 return path
 
             case .absolute(let uri):
-                // Try to extract path from URI
-                if let pathString = uri.path {
-                    return try? RFC_3986.URI.Path(pathString)
-                }
-                return nil
+                // Return path from URI
+                return uri.path
 
             case .authority, .asterisk:
                 return nil
@@ -508,11 +502,8 @@ extension RFC_9110.Request {
                 return query
 
             case .absolute(let uri):
-                // Try to extract query from URI
-                if let queryString = uri.query {
-                    return try? RFC_3986.URI.Query(queryString)
-                }
-                return nil
+                // Return query from URI
+                return uri.query
 
             case .authority, .asterisk:
                 return nil
@@ -568,7 +559,7 @@ extension RFC_9110.Request {
 
 // MARK: - Codable
 
-extension RFC_9110.Request: Codable {
+extension RFC_9110.Request {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let method = try container.decode(RFC_9110.Method.self, forKey: .method)
@@ -604,7 +595,7 @@ extension RFC_9110.Request: Codable {
     }
 }
 
-extension RFC_9110.Request.Target: Codable {
+extension RFC_9110.Request.Target {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let form = try container.decode(String.self, forKey: .form)
@@ -690,5 +681,34 @@ extension RFC_9110.Request: CustomStringConvertible {
 extension RFC_9110.Request.Target: CustomStringConvertible {
     public var description: String {
         rawValue
+    }
+}
+
+// MARK: - CustomDebugStringConvertible
+
+extension RFC_9110.Request: CustomDebugStringConvertible {
+    /// Returns a detailed debug description of the request
+    ///
+    /// Provides a structured view showing method, target, header count, and body size.
+    ///
+    /// ## Example Output
+    ///
+    /// ```
+    /// HTTP.Request(
+    ///   method: GET
+    ///   target: /api/users
+    ///   headers: 3 field(s)
+    ///   body: 0 bytes
+    /// )
+    /// ```
+    public var debugDescription: String {
+        """
+        HTTP.Request(
+          method: \(method.rawValue)
+          target: \(target.rawValue)
+          headers: \(headers.count) field\(headers.count == 1 ? "" : "s")
+          body: \(body?.count ?? 0) bytes
+        )
+        """
     }
 }

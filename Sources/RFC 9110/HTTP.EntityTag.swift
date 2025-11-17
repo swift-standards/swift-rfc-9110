@@ -56,7 +56,7 @@ extension RFC_9110 {
     ///
     /// - [RFC 9110 Section 8.8.3: ETag](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.3)
     /// - [RFC 9110 Section 13.1: Validators](https://www.rfc-editor.org/rfc/rfc9110.html#section-13.1)
-    public struct EntityTag: Sendable, Equatable, Hashable {
+    public struct EntityTag: Sendable, Equatable, Hashable, Codable {
         /// The opaque tag value (without quotes)
         public let value: String
 
@@ -74,22 +74,6 @@ extension RFC_9110 {
         public init(value: String, isWeak: Bool = false) {
             self.value = value
             self.isWeak = isWeak
-        }
-
-        /// Creates a strong entity tag
-        ///
-        /// - Parameter value: The opaque tag value
-        /// - Returns: A strong entity tag
-        public static func strong(_ value: String) -> EntityTag {
-            EntityTag(value: value, isWeak: false)
-        }
-
-        /// Creates a weak entity tag
-        ///
-        /// - Parameter value: The opaque tag value
-        /// - Returns: A weak entity tag
-        public static func weak(_ value: String) -> EntityTag {
-            EntityTag(value: value, isWeak: true)
         }
 
         /// The header value representation
@@ -147,40 +131,6 @@ extension RFC_9110 {
             let value = String(tagPart.dropFirst().dropLast())
             return EntityTag(value: value, isWeak: isWeak)
         }
-
-        /// Performs a strong comparison between two entity tags
-        ///
-        /// Strong comparison returns true only if both tags are strong and
-        /// their values match byte-for-byte.
-        ///
-        /// - Parameters:
-        ///   - lhs: The first entity tag
-        ///   - rhs: The second entity tag
-        /// - Returns: True if both are strong tags with matching values
-        ///
-        /// ## Reference
-        ///
-        /// - [RFC 9110 Section 8.8.3.2: Comparison](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.3.2)
-        public static func strongCompare(_ lhs: EntityTag, _ rhs: EntityTag) -> Bool {
-            !lhs.isWeak && !rhs.isWeak && lhs.value == rhs.value
-        }
-
-        /// Performs a weak comparison between two entity tags
-        ///
-        /// Weak comparison returns true if the values match, regardless of
-        /// whether the tags are weak or strong.
-        ///
-        /// - Parameters:
-        ///   - lhs: The first entity tag
-        ///   - rhs: The second entity tag
-        /// - Returns: True if the values match
-        ///
-        /// ## Reference
-        ///
-        /// - [RFC 9110 Section 8.8.3.2: Comparison](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.3.2)
-        public static func weakCompare(_ lhs: EntityTag, _ rhs: EntityTag) -> Bool {
-            lhs.value == rhs.value
-        }
     }
 }
 
@@ -194,7 +144,7 @@ extension RFC_9110.EntityTag: CustomStringConvertible {
 
 // MARK: - Codable
 
-extension RFC_9110.EntityTag: Codable {
+extension RFC_9110.EntityTag {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let string = try container.decode(String.self)
@@ -215,6 +165,26 @@ extension RFC_9110.EntityTag: Codable {
     }
 }
 
+// MARK: - LosslessStringConvertible
+
+extension RFC_9110.EntityTag: LosslessStringConvertible {
+    /// Creates an entity tag from a string description
+    ///
+    /// - Parameter description: The ETag string (e.g., `"abc123"`, `W/"abc123"`)
+    /// - Returns: An entity tag instance, or nil if parsing fails
+    ///
+    /// # Example
+    ///
+    /// ```swift
+    /// let etag = HTTP.EntityTag("\"abc123\"")  // Strong ETag
+    /// let str = String(etag)                   // "\"abc123\"" - perfect round-trip
+    /// ```
+    public init?(_ description: String) {
+        guard let parsed = Self.parse(description) else { return nil }
+        self = parsed
+    }
+}
+
 // MARK: - ExpressibleByStringLiteral
 
 extension RFC_9110.EntityTag: ExpressibleByStringLiteral {
@@ -225,5 +195,59 @@ extension RFC_9110.EntityTag: ExpressibleByStringLiteral {
             // Fallback: treat as strong ETag with the literal value
             self = RFC_9110.EntityTag(value: value, isWeak: false)
         }
+    }
+}
+
+// MARK: - Factory Methods and Comparison
+
+extension RFC_9110.EntityTag {
+    /// Creates a strong entity tag
+    ///
+    /// - Parameter value: The opaque tag value
+    /// - Returns: A strong entity tag
+    public static func strong(_ value: String) -> Self {
+        Self(value: value, isWeak: false)
+    }
+
+    /// Creates a weak entity tag
+    ///
+    /// - Parameter value: The opaque tag value
+    /// - Returns: A weak entity tag
+    public static func weak(_ value: String) -> Self {
+        Self(value: value, isWeak: true)
+    }
+
+    /// Performs a strong comparison between two entity tags
+    ///
+    /// Strong comparison returns true only if both tags are strong and
+    /// their values match byte-for-byte.
+    ///
+    /// - Parameters:
+    ///   - lhs: The first entity tag
+    ///   - rhs: The second entity tag
+    /// - Returns: True if both are strong tags with matching values
+    ///
+    /// ## Reference
+    ///
+    /// - [RFC 9110 Section 8.8.3.2: Comparison](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.3.2)
+    public static func strongCompare(_ lhs: Self, _ rhs: Self) -> Bool {
+        !lhs.isWeak && !rhs.isWeak && lhs.value == rhs.value
+    }
+
+    /// Performs a weak comparison between two entity tags
+    ///
+    /// Weak comparison returns true if the values match, regardless of
+    /// whether the tags are weak or strong.
+    ///
+    /// - Parameters:
+    ///   - lhs: The first entity tag
+    ///   - rhs: The second entity tag
+    /// - Returns: True if the values match
+    ///
+    /// ## Reference
+    ///
+    /// - [RFC 9110 Section 8.8.3.2: Comparison](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.3.2)
+    public static func weakCompare(_ lhs: Self, _ rhs: Self) -> Bool {
+        lhs.value == rhs.value
     }
 }

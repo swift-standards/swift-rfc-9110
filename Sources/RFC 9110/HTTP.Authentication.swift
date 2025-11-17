@@ -49,31 +49,6 @@ extension RFC_9110.Authentication {
             self.name = name
         }
 
-        // MARK: - Standard Schemes
-
-        /// Basic authentication (RFC 7617)
-        ///
-        /// Uses base64-encoded username:password credentials
-        public static let basic = Scheme("Basic")
-
-        /// Bearer token authentication (RFC 6750)
-        ///
-        /// Used for OAuth 2.0 access tokens
-        public static let bearer = Scheme("Bearer")
-
-        /// Digest authentication (RFC 7616)
-        ///
-        /// Challenge-response authentication with hashing
-        public static let digest = Scheme("Digest")
-
-        /// Negotiate authentication (RFC 4559)
-        ///
-        /// SPNEGO-based authentication
-        public static let negotiate = Scheme("Negotiate")
-
-        /// OAuth authentication (RFC 5849)
-        public static let oauth = Scheme("OAuth")
-
         // MARK: - Equatable
 
         public static func == (lhs: Scheme, rhs: Scheme) -> Bool {
@@ -268,36 +243,6 @@ extension RFC_9110.Authentication {
             self.token = token
         }
 
-        /// Creates Basic authentication credentials
-        ///
-        /// - Parameters:
-        ///   - username: The username
-        ///   - password: The password
-        /// - Returns: Basic authentication credentials
-        ///
-        /// ## Example
-        ///
-        /// ```swift
-        /// let creds = HTTP.Authentication.Credentials.basic(
-        ///     username: "user",
-        ///     password: "pass"
-        /// )
-        /// // Authorization: Basic dXNlcjpwYXNz
-        /// ```
-        public static func basic(username: String, password: String) -> Credentials {
-            let combined = "\(username):\(password)"
-            let encoded = Data(combined.utf8).base64EncodedString()
-            return Credentials(scheme: .basic, token: encoded)
-        }
-
-        /// Creates Bearer token credentials
-        ///
-        /// - Parameter token: The bearer token
-        /// - Returns: Bearer token credentials
-        public static func bearer(_ token: String) -> Credentials {
-            Credentials(scheme: .bearer, token: token)
-        }
-
         /// The header value for the Authorization header
         ///
         /// ## Example
@@ -376,5 +321,66 @@ extension RFC_9110.Authentication.Credentials: Codable {}
 extension RFC_9110.Authentication.Scheme: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self.init(value)
+    }
+}
+
+// MARK: - Standard Authentication Schemes
+
+extension RFC_9110.Authentication.Scheme {
+    /// Basic authentication (RFC 7617)
+    ///
+    /// Uses base64-encoded username:password credentials
+    public static let basic = Self("Basic")
+
+    /// Bearer token authentication (RFC 6750)
+    ///
+    /// Used for OAuth 2.0 access tokens
+    public static let bearer = Self("Bearer")
+
+    /// Digest authentication (RFC 7616)
+    ///
+    /// Challenge-response authentication with hashing
+    public static let digest = Self("Digest")
+
+    /// Negotiate authentication (RFC 4559)
+    ///
+    /// SPNEGO-based authentication
+    public static let negotiate = Self("Negotiate")
+
+    /// OAuth authentication (RFC 5849)
+    public static let oauth = Self("OAuth")
+}
+
+// MARK: - Credentials Factory Methods
+
+extension RFC_9110.Authentication.Credentials {
+    /// Creates Basic authentication credentials
+    ///
+    /// - Parameters:
+    ///   - username: The username
+    ///   - password: The password
+    /// - Returns: Basic authentication credentials
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// let creds = HTTP.Authentication.Credentials.basic(
+    ///     username: "user",
+    ///     password: "pass"
+    /// )
+    /// // Authorization: Basic dXNlcjpwYXNz
+    /// ```
+    public static func basic(username: String, password: String) -> RFC_9110.Authentication.Credentials {
+        let combined = "\(username):\(password)"
+        let encoded = Data(combined.utf8).base64EncodedString()
+        return Self(scheme: .basic, token: encoded)
+    }
+
+    /// Creates Bearer token credentials
+    ///
+    /// - Parameter token: The bearer token
+    /// - Returns: Bearer token credentials
+    public static func bearer(_ token: String) -> RFC_9110.Authentication.Credentials {
+        Self(scheme: .bearer, token: token)
     }
 }

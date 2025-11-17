@@ -106,55 +106,6 @@ extension RFC_9110 {
             }
         }
 
-        // MARK: - Standard Methods (RFC 9110 Section 9.3)
-
-        /// GET: Transfer current representation of target resource (Section 9.3.1)
-        ///
-        /// Safe, idempotent, cacheable
-        public static let get = Method("GET", isSafe: true, isIdempotent: true, isCacheable: true)
-
-        /// HEAD: Same as GET but transfer only status line and header section (Section 9.3.2)
-        ///
-        /// Safe, idempotent, cacheable
-        public static let head = Method("HEAD", isSafe: true, isIdempotent: true, isCacheable: true)
-
-        /// POST: Perform resource-specific processing on request content (Section 9.3.3)
-        ///
-        /// Not safe, not idempotent, cacheable with explicit freshness info
-        public static let post = Method("POST", isSafe: false, isIdempotent: false, isCacheable: true)
-
-        /// PUT: Replace all current representations of target resource (Section 9.3.4)
-        ///
-        /// Not safe, idempotent, not cacheable
-        public static let put = Method("PUT", isSafe: false, isIdempotent: true, isCacheable: false)
-
-        /// DELETE: Remove all current representations of target resource (Section 9.3.5)
-        ///
-        /// Not safe, idempotent, not cacheable
-        public static let delete = Method("DELETE", isSafe: false, isIdempotent: true, isCacheable: false)
-
-        /// CONNECT: Establish tunnel to server identified by target resource (Section 9.3.6)
-        ///
-        /// Not safe, not idempotent, not cacheable
-        public static let connect = Method("CONNECT", isSafe: false, isIdempotent: false, isCacheable: false)
-
-        /// OPTIONS: Describe communication options for target resource (Section 9.3.7)
-        ///
-        /// Safe, idempotent, not cacheable
-        public static let options = Method("OPTIONS", isSafe: true, isIdempotent: true, isCacheable: false)
-
-        /// TRACE: Perform message loop-back test along path to target resource (Section 9.3.8)
-        ///
-        /// Safe, idempotent, not cacheable
-        public static let trace = Method("TRACE", isSafe: true, isIdempotent: true, isCacheable: false)
-
-        // MARK: - Additional Standard Methods
-
-        /// PATCH: Apply partial modifications to a resource (RFC 5789)
-        ///
-        /// Not safe, not idempotent (by default), not cacheable
-        public static let patch = Method("PATCH", isSafe: false, isIdempotent: false, isCacheable: false)
-
         // MARK: - Equatable
 
         public static func == (lhs: Method, rhs: Method) -> Bool {
@@ -200,6 +151,55 @@ extension RFC_9110 {
     }
 }
 
+// MARK: - Standard Methods
+
+extension RFC_9110.Method {
+    /// GET: Transfer current representation of target resource (Section 9.3.1)
+    ///
+    /// Safe, idempotent, cacheable
+    public static let get = Self("GET", isSafe: true, isIdempotent: true, isCacheable: true)
+
+    /// HEAD: Same as GET but transfer only status line and header section (Section 9.3.2)
+    ///
+    /// Safe, idempotent, cacheable
+    public static let head = Self("HEAD", isSafe: true, isIdempotent: true, isCacheable: true)
+
+    /// POST: Perform resource-specific processing on request content (Section 9.3.3)
+    ///
+    /// Not safe, not idempotent, cacheable with explicit freshness info
+    public static let post = Self("POST", isSafe: false, isIdempotent: false, isCacheable: true)
+
+    /// PUT: Replace all current representations of target resource (Section 9.3.4)
+    ///
+    /// Not safe, idempotent, not cacheable
+    public static let put = Self("PUT", isSafe: false, isIdempotent: true, isCacheable: false)
+
+    /// DELETE: Remove all current representations of target resource (Section 9.3.5)
+    ///
+    /// Not safe, idempotent, not cacheable
+    public static let delete = Self("DELETE", isSafe: false, isIdempotent: true, isCacheable: false)
+
+    /// CONNECT: Establish tunnel to server identified by target resource (Section 9.3.6)
+    ///
+    /// Not safe, not idempotent, not cacheable
+    public static let connect = Self("CONNECT", isSafe: false, isIdempotent: false, isCacheable: false)
+
+    /// OPTIONS: Describe communication options for target resource (Section 9.3.7)
+    ///
+    /// Safe, idempotent, not cacheable
+    public static let options = Self("OPTIONS", isSafe: true, isIdempotent: true, isCacheable: false)
+
+    /// TRACE: Perform message loop-back test along path to target resource (Section 9.3.8)
+    ///
+    /// Safe, idempotent, not cacheable
+    public static let trace = Self("TRACE", isSafe: true, isIdempotent: true, isCacheable: false)
+
+    /// PATCH: Apply partial modifications to a resource (RFC 5789)
+    ///
+    /// Not safe, not idempotent (by default), not cacheable
+    public static let patch = Self("PATCH", isSafe: false, isIdempotent: false, isCacheable: false)
+}
+
 // MARK: - CustomStringConvertible
 
 extension RFC_9110.Method: CustomStringConvertible {
@@ -208,10 +208,63 @@ extension RFC_9110.Method: CustomStringConvertible {
     }
 }
 
+// MARK: - LosslessStringConvertible
+
+extension RFC_9110.Method: LosslessStringConvertible {
+    /// Creates a method from a string description
+    ///
+    /// - Parameter description: The method name (e.g., "GET", "POST")
+    /// - Returns: A method instance, or nil if the string is invalid
+    ///
+    /// # Example
+    ///
+    /// ```swift
+    /// let method = HTTP.Method("GET")  // Returns .get with correct properties
+    /// let str = String(method)         // "GET" - perfect round-trip
+    /// ```
+    public init?(_ description: String) {
+        self.init(rawValue: description)
+    }
+}
+
 // MARK: - ExpressibleByStringLiteral
 
 extension RFC_9110.Method: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self.init(rawValue: value)
+    }
+}
+
+// MARK: - CaseIterable
+
+extension RFC_9110.Method: CaseIterable {
+    /// All standard HTTP methods defined in RFC 9110 and RFC 5789
+    ///
+    /// Returns the 9 standard methods:
+    /// - RFC 9110 Section 9.3: GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE
+    /// - RFC 5789: PATCH
+    ///
+    /// ## Important Note
+    ///
+    /// This collection contains only the **standard methods** defined by RFCs.
+    /// Custom methods created via `Method("CUSTOM")` will not appear in this collection.
+    /// Use this for:
+    /// - UI pickers showing standard methods
+    /// - Validation: `Method.allCases.contains(method)`
+    /// - Documentation and tooling
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// // Enumerate standard methods
+    /// for method in HTTP.Method.allCases {
+    ///     print(method.rawValue)  // GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
+    /// }
+    ///
+    /// // Check if method is standard
+    /// let isStandard = HTTP.Method.allCases.contains(requestMethod)
+    /// ```
+    public static var allCases: [RFC_9110.Method] {
+        [.get, .head, .post, .put, .delete, .connect, .options, .trace, .patch]
     }
 }

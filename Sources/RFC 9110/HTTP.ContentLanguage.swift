@@ -36,50 +36,6 @@ extension HTTP {
             self.tag = tag.lowercased()
         }
 
-        // MARK: - Common Language Tags
-
-        /// English
-        public static let english = ContentLanguage("en")
-
-        /// English (United States)
-        public static let englishUS = ContentLanguage("en-US")
-
-        /// English (United Kingdom)
-        public static let englishUK = ContentLanguage("en-GB")
-
-        /// French
-        public static let french = ContentLanguage("fr")
-
-        /// French (Canada)
-        public static let frenchCA = ContentLanguage("fr-CA")
-
-        /// German
-        public static let german = ContentLanguage("de")
-
-        /// Spanish
-        public static let spanish = ContentLanguage("es")
-
-        /// Italian
-        public static let italian = ContentLanguage("it")
-
-        /// Japanese
-        public static let japanese = ContentLanguage("ja")
-
-        /// Chinese (Simplified)
-        public static let chineseSimplified = ContentLanguage("zh-Hans")
-
-        /// Chinese (Traditional)
-        public static let chineseTraditional = ContentLanguage("zh-Hant")
-
-        /// Portuguese
-        public static let portuguese = ContentLanguage("pt")
-
-        /// Dutch
-        public static let dutch = ContentLanguage("nl")
-
-        /// Russian
-        public static let russian = ContentLanguage("ru")
-
         // MARK: - Header Parsing
 
         /// Parses a Content-Language header value into an array of ContentLanguage values
@@ -149,4 +105,50 @@ extension HTTP.ContentLanguage: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self.init(value)
     }
+}
+
+// MARK: - Common Language Tags
+
+extension HTTP.ContentLanguage {
+    /// English
+    public static let english = Self("en")
+
+    /// English (United States)
+    public static let englishUS = Self("en-US")
+
+    /// English (United Kingdom)
+    public static let englishUK = Self("en-GB")
+
+    /// French
+    public static let french = Self("fr")
+
+    /// French (Canada)
+    public static let frenchCA = Self("fr-CA")
+
+    /// German
+    public static let german = Self("de")
+
+    /// Spanish
+    public static let spanish = Self("es")
+
+    /// Italian
+    public static let italian = Self("it")
+
+    /// Japanese
+    public static let japanese = Self("ja")
+
+    /// Chinese (Simplified)
+    public static let chineseSimplified = Self("zh-Hans")
+
+    /// Chinese (Traditional)
+    public static let chineseTraditional = Self("zh-Hant")
+
+    /// Portuguese
+    public static let portuguese = Self("pt")
+
+    /// Dutch
+    public static let dutch = Self("nl")
+
+    /// Russian
+    public static let russian = Self("ru")
 }

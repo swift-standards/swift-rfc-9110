@@ -50,7 +50,7 @@ extension RFC_9110 {
     ///
     /// - [RFC 9110 Section 8.4: Content-Encoding](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.4)
     /// - [RFC 9110 Section 8.4.1: Content Codings](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.4.1)
-    public struct ContentEncoding: Sendable, Equatable, Hashable {
+    public struct ContentEncoding: Sendable, Equatable, Hashable, Codable {
         /// The encoding name (case-insensitive token)
         public let value: String
 
@@ -60,35 +60,6 @@ extension RFC_9110 {
         public init(_ value: String) {
             self.value = value.lowercased()
         }
-
-        // MARK: - Standard Encodings
-
-        /// GZIP compression (RFC 1952)
-        ///
-        /// Format using LZ77 and Huffman coding.
-        /// Widely supported and recommended for general use.
-        public static let gzip = ContentEncoding("gzip")
-
-        /// DEFLATE compression (RFC 1951)
-        ///
-        /// Uses the zlib structure with deflate compression.
-        public static let deflate = ContentEncoding("deflate")
-
-        /// UNIX compress (obsolete)
-        ///
-        /// Legacy LZW algorithm. Not recommended for new implementations.
-        public static let compress = ContentEncoding("compress")
-
-        /// Brotli compression (RFC 7932)
-        ///
-        /// Modern compression algorithm offering better compression than gzip.
-        /// Supported by most modern browsers.
-        public static let brotli = ContentEncoding("br")
-
-        /// Identity encoding (no transformation)
-        ///
-        /// Explicitly indicates no encoding. Normally this is implied by absence.
-        public static let identity = ContentEncoding("identity")
 
         /// Parses content encodings from a header value
         ///
@@ -144,7 +115,7 @@ extension RFC_9110.ContentEncoding: CustomStringConvertible {
 
 // MARK: - Codable
 
-extension RFC_9110.ContentEncoding: Codable {
+extension RFC_9110.ContentEncoding {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let value = try container.decode(String.self)
@@ -163,4 +134,35 @@ extension RFC_9110.ContentEncoding: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self.init(value)
     }
+}
+
+// MARK: - Standard Encodings
+
+extension RFC_9110.ContentEncoding {
+    /// GZIP compression (RFC 1952)
+    ///
+    /// Format using LZ77 and Huffman coding.
+    /// Widely supported and recommended for general use.
+    public static let gzip = Self("gzip")
+
+    /// DEFLATE compression (RFC 1951)
+    ///
+    /// Uses the zlib structure with deflate compression.
+    public static let deflate = Self("deflate")
+
+    /// UNIX compress (obsolete)
+    ///
+    /// Legacy LZW algorithm. Not recommended for new implementations.
+    public static let compress = Self("compress")
+
+    /// Brotli compression (RFC 7932)
+    ///
+    /// Modern compression algorithm offering better compression than gzip.
+    /// Supported by most modern browsers.
+    public static let brotli = Self("br")
+
+    /// Identity encoding (no transformation)
+    ///
+    /// Explicitly indicates no encoding. Normally this is implied by absence.
+    public static let identity = Self("identity")
 }

@@ -43,7 +43,7 @@ extension RFC_9110 {
     ///
     /// - [RFC 9110 Section 6.3: Header Fields](https://www.rfc-editor.org/rfc/rfc9110.html#section-6.3)
     /// - [RFC 9110 Section 5.2: Field Order](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.2)
-    public struct Headers: Sendable, Equatable, Hashable {
+    public struct Headers: Sendable, Equatable, Hashable, Codable {
         // Internal storage: maps header name -> list of values
         private var storage: [Header.Field.Name: [Header.Field.Value]]
 
@@ -234,7 +234,7 @@ extension RFC_9110.Headers: CustomStringConvertible {
 
 // MARK: - Codable
 
-extension RFC_9110.Headers: Codable {
+extension RFC_9110.Headers {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let fields = try container.decode([RFC_9110.Header.Field].self)
@@ -245,5 +245,35 @@ extension RFC_9110.Headers: Codable {
         var container = encoder.singleValueContainer()
         // Encode as array of fields for compatibility
         try container.encode(Array(self))
+    }
+}
+
+// MARK: - CustomDebugStringConvertible
+
+extension RFC_9110.Headers: CustomDebugStringConvertible {
+    /// Returns a detailed debug description of the headers collection
+    ///
+    /// Provides a structured view showing the count and all header fields.
+    ///
+    /// ## Example Output
+    ///
+    /// ```
+    /// HTTP.Headers(3 fields):
+    ///   Content-Type: application/json
+    ///   Accept: application/json
+    ///   User-Agent: MyApp/1.0
+    /// ```
+    public var debugDescription: String {
+        let headerLines = map { "  \($0.name.rawValue): \($0.value.rawValue)" }
+            .joined(separator: "\n")
+
+        if isEmpty {
+            return "HTTP.Headers(0 fields)"
+        } else {
+            return """
+            HTTP.Headers(\(count) field\(count == 1 ? "" : "s")):
+            \(headerLines)
+            """
+        }
     }
 }
