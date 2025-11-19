@@ -7,7 +7,8 @@
 //
 // Media types for HTTP content negotiation
 
-import Foundation
+import Standards
+import INCITS_4_1986
 
 extension RFC_9110 {
     /// HTTP Media Type (RFC 9110 Section 8.3)
@@ -97,33 +98,33 @@ extension RFC_9110 {
         /// // mt?.parameters["charset"] == "utf-8"
         /// ```
         public static func parse(_ string: String) -> MediaType? {
-            let trimmed = string.trimmingCharacters(in: .whitespaces)
+            let trimmed = string.trimming(.whitespaces)
 
             // Split on first semicolon to separate type/subtype from parameters
-            let components = trimmed.components(separatedBy: ";")
+            let components = trimmed.split(separator: ";")
             guard let firstComponent = components.first else { return nil }
 
             // Parse type/subtype
-            let typeComponents = firstComponent.trimmingCharacters(in: .whitespaces)
-                .components(separatedBy: "/")
+            let typeComponents = firstComponent.trimming(.whitespaces)
+                .split(separator: "/")
             guard typeComponents.count == 2,
                   !typeComponents[0].isEmpty,
                   !typeComponents[1].isEmpty else {
                 return nil
             }
 
-            let type = typeComponents[0].trimmingCharacters(in: .whitespaces)
-            let subtype = typeComponents[1].trimmingCharacters(in: .whitespaces)
+            let type = typeComponents[0].trimming(.whitespaces)
+            let subtype = typeComponents[1].trimming(.whitespaces)
 
             // Parse parameters
             var parameters: [String: String] = [:]
             if components.count > 1 {
                 for param in components.dropFirst() {
-                    let paramParts = param.components(separatedBy: "=")
+                    let paramParts = param.split(separator: "=")
                     guard paramParts.count == 2 else { continue }
 
-                    let key = paramParts[0].trimmingCharacters(in: .whitespaces).lowercased()
-                    var value = paramParts[1].trimmingCharacters(in: .whitespaces)
+                    let key = paramParts[0].trimming(.whitespaces).lowercased()
+                    var value = paramParts[1].trimming(.whitespaces)
 
                     // Remove quotes if present
                     if value.hasPrefix("\"") && value.hasSuffix("\"") {

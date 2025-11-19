@@ -6,7 +6,6 @@
 //
 // A collection of HTTP header fields with convenient access
 
-import Foundation
 
 // MARK: - Headers Collection
 

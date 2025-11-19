@@ -6,7 +6,9 @@
 //
 // HTTP authentication framework
 
-import Foundation
+import Standards
+import RFC_4648
+import INCITS_4_1986
 
 extension RFC_9110 {
     /// HTTP Authentication (RFC 9110 Section 11)
@@ -159,7 +161,7 @@ extension RFC_9110.Authentication {
         /// - Parameter headerValue: The WWW-Authenticate header value
         /// - Returns: A Challenge if parsing succeeds, nil otherwise
         public static func parse(_ headerValue: String) -> Challenge? {
-            let trimmed = headerValue.trimmingCharacters(in: .whitespaces)
+            let trimmed = headerValue.trimming(.whitespaces)
 
             // Extract scheme (first token)
             guard let spaceIndex = trimmed.firstIndex(of: " ") else {
@@ -175,15 +177,15 @@ extension RFC_9110.Authentication {
             var parameters: [String: String] = [:]
 
             // Simple parameter parsing (doesn't handle all edge cases)
-            let paramComponents = paramsString.components(separatedBy: ",")
+            let paramComponents = paramsString.split(separator: ",")
             for component in paramComponents {
-                let trimmedComponent = component.trimmingCharacters(in: .whitespaces)
-                let parts = trimmedComponent.components(separatedBy: "=")
+                let trimmedComponent = component.trimming(.whitespaces)
+                let parts = trimmedComponent.split(separator: "=")
 
                 guard parts.count == 2 else { continue }
 
-                let key = parts[0].trimmingCharacters(in: .whitespaces)
-                var value = parts[1].trimmingCharacters(in: .whitespaces)
+                let key = parts[0].trimming(.whitespaces)
+                var value = parts[1].trimming(.whitespaces)
 
                 // Remove quotes if present
                 if value.hasPrefix("\"") && value.hasSuffix("\"") {
@@ -260,7 +262,7 @@ extension RFC_9110.Authentication {
         /// - Parameter headerValue: The Authorization header value
         /// - Returns: Credentials if parsing succeeds, nil otherwise
         public static func parse(_ headerValue: String) -> Credentials? {
-            let trimmed = headerValue.trimmingCharacters(in: .whitespaces)
+            let trimmed = headerValue.trimming(.whitespaces)
 
             guard let spaceIndex = trimmed.firstIndex(of: " ") else {
                 return nil
@@ -270,7 +272,7 @@ extension RFC_9110.Authentication {
             let scheme = Scheme(schemeName)
 
             let token = String(trimmed[trimmed.index(after: spaceIndex)...])
-                .trimmingCharacters(in: .whitespaces)
+                .trimming(.whitespaces)
 
             return Credentials(scheme: scheme, token: token)
         }
@@ -372,7 +374,8 @@ extension RFC_9110.Authentication.Credentials {
     /// ```
     public static func basic(username: String, password: String) -> RFC_9110.Authentication.Credentials {
         let combined = "\(username):\(password)"
-        let encoded = Data(combined.utf8).base64EncodedString()
+        let bytes = Array(combined.utf8)
+        let encoded = String(base64Encoding: bytes)
         return Self(scheme: .basic, token: encoded)
     }
 

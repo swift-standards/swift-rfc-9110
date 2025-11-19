@@ -7,7 +7,6 @@
 // The method token indicates the request method to be performed on the
 // target resource. The request method is case-sensitive.
 
-import Foundation
 
 extension RFC_9110 {
     /// HTTP Method (RFC 9110 Section 9)

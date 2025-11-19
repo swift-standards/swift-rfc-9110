@@ -7,7 +7,6 @@
 // HTTP header fields are key-value pairs that convey information about the
 // message, its content, or the connection itself.
 
-import Foundation
 
 extension RFC_9110 {
     /// HTTP Header namespace (RFC 9110 Section 6.3)
@@ -237,16 +236,6 @@ extension RFC_9110.Header.Field {
     }
 }
 
-// MARK: - LocalizedError Conformance
-
-extension RFC_9110.Header.Field.ValidationError: LocalizedError {
-    public var errorDescription: String? {
-        switch self {
-        case .invalidFieldValue(let value, let reason):
-            return "Invalid HTTP header field value: \(reason) - Value: \"\(value)\""
-        }
-    }
-}
 
 // MARK: - Name String Conversion
 

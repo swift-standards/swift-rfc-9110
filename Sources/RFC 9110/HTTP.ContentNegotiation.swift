@@ -6,7 +6,8 @@
 //
 // Proactive content negotiation mechanisms
 
-import Foundation
+import Standards
+import INCITS_4_1986
 
 extension RFC_9110 {
     /// HTTP Content Negotiation (RFC 9110 Section 12)
@@ -151,23 +152,23 @@ extension RFC_9110.ContentNegotiation {
         /// // Returns 3 preferences sorted by quality
         /// ```
         public static func parse(_ headerValue: String) -> [MediaTypePreference] {
-            let components = headerValue.components(separatedBy: ",")
+            let components = headerValue.split(separator: ",")
             var preferences: [MediaTypePreference] = []
 
             for component in components {
-                let trimmed = component.trimmingCharacters(in: .whitespaces)
+                let trimmed = component.trimming(.whitespaces)
 
                 // Split on semicolon to separate media type from parameters
-                let parts = trimmed.components(separatedBy: ";")
+                let parts = trimmed.split(separator: ";")
                 guard let typeSubtype = parts.first,
-                      let mediaType = RFC_9110.MediaType.parse(typeSubtype) else {
+                      let mediaType = RFC_9110.MediaType.parse(String(typeSubtype)) else {
                     continue
                 }
 
                 // Look for q parameter
                 var quality = QualityValue.default
                 for part in parts.dropFirst() {
-                    let param = part.trimmingCharacters(in: .whitespaces)
+                    let param = part.trimming(.whitespaces)
                     if param.hasPrefix("q=") {
                         let qValue = String(param.dropFirst(2))
                         if let parsed = QualityValue.parse(qValue) {
@@ -291,7 +292,17 @@ extension RFC_9110.ContentNegotiation {
 
 extension RFC_9110.ContentNegotiation.QualityValue: CustomStringConvertible {
     public var description: String {
-        String(format: "%.3f", value).replacingOccurrences(of: #"\.?0+$"#, with: "", options: .regularExpression)
+        // Convert to string with 3 decimal places
+        let rounded = (value * 1000).rounded() / 1000
+        var result = "\(rounded)"
+
+        // If no decimal point, we're done
+        guard result.contains(".") else { return result }
+
+        // Remove trailing zeros and decimal point if needed
+        result = result.replacing(/\.?0+$/, with: "")
+
+        return result
     }
 }
 
@@ -351,25 +362,25 @@ extension RFC_9110.ContentNegotiation {
         /// )
         /// ```
         public static func parse(_ headerValue: String) -> [EncodingPreference] {
-            let components = headerValue.components(separatedBy: ",")
+            let components = headerValue.split(separator: ",")
             var preferences: [EncodingPreference] = []
             
             for component in components {
-                let trimmed = component.trimmingCharacters(in: .whitespaces)
-                
+                let trimmed = component.trimming(.whitespaces)
+
                 // Split on semicolon to separate encoding from quality
-                let parts = trimmed.components(separatedBy: ";")
-                guard let encodingString = parts.first?.trimmingCharacters(in: .whitespaces),
+                let parts = trimmed.split(separator: ";")
+                guard let encodingString = parts.first?.trimming(.whitespaces),
                       !encodingString.isEmpty else {
                     continue
                 }
-                
+
                 let encoding = RFC_9110.ContentEncoding(encodingString)
-                
+
                 // Look for q parameter
                 var quality = QualityValue.default
                 for part in parts.dropFirst() {
-                    let param = part.trimmingCharacters(in: .whitespaces)
+                    let param = part.trimming(.whitespaces)
                     if param.hasPrefix("q=") {
                         let qValue = String(param.dropFirst(2))
                         if let parsed = QualityValue.parse(qValue) {
@@ -443,23 +454,23 @@ extension RFC_9110.ContentNegotiation {
         /// )
         /// ```
         public static func parse(_ headerValue: String) -> [LanguagePreference] {
-            let components = headerValue.components(separatedBy: ",")
+            let components = headerValue.split(separator: ",")
             var preferences: [LanguagePreference] = []
             
             for component in components {
-                let trimmed = component.trimmingCharacters(in: .whitespaces)
-                
+                let trimmed = component.trimming(.whitespaces)
+
                 // Split on semicolon to separate language from quality
-                let parts = trimmed.components(separatedBy: ";")
-                guard let language = parts.first?.trimmingCharacters(in: .whitespaces),
+                let parts = trimmed.split(separator: ";")
+                guard let language = parts.first?.trimming(.whitespaces),
                       !language.isEmpty else {
                     continue
                 }
-                
+
                 // Look for q parameter
                 var quality = QualityValue.default
                 for part in parts.dropFirst() {
-                    let param = part.trimmingCharacters(in: .whitespaces)
+                    let param = part.trimming(.whitespaces)
                     if param.hasPrefix("q=") {
                         let qValue = String(param.dropFirst(2))
                         if let parsed = QualityValue.parse(qValue) {
@@ -544,23 +555,23 @@ extension RFC_9110.ContentNegotiation {
         /// )
         /// ```
         public static func parse(_ headerValue: String) -> [CharsetPreference] {
-            let components = headerValue.components(separatedBy: ",")
+            let components = headerValue.split(separator: ",")
             var preferences: [CharsetPreference] = []
             
             for component in components {
-                let trimmed = component.trimmingCharacters(in: .whitespaces)
-                
+                let trimmed = component.trimming(.whitespaces)
+
                 // Split on semicolon to separate charset from quality
-                let parts = trimmed.components(separatedBy: ";")
-                guard let charset = parts.first?.trimmingCharacters(in: .whitespaces),
+                let parts = trimmed.split(separator: ";")
+                guard let charset = parts.first?.trimming(.whitespaces),
                       !charset.isEmpty else {
                     continue
                 }
-                
+
                 // Look for q parameter
                 var quality = QualityValue.default
                 for part in parts.dropFirst() {
-                    let param = part.trimmingCharacters(in: .whitespaces)
+                    let param = part.trimming(.whitespaces)
                     if param.hasPrefix("q=") {
                         let qValue = String(param.dropFirst(2))
                         if let parsed = QualityValue.parse(qValue) {

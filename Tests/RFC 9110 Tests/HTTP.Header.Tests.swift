@@ -2,7 +2,6 @@
 // swift-rfc-9110
 
 import Testing
-import Foundation
 @testable import RFC_9110
 
 @Suite("HTTP.Header.Field Tests")

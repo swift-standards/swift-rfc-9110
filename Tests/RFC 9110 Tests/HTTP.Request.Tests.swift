@@ -2,7 +2,6 @@
 // swift-rfc-9110
 
 import Testing
-import Foundation
 import RFC_3986
 @testable import RFC_9110
 
@@ -102,7 +101,7 @@ struct HTTPRequestMessageTests {
 
     @Test("POST request with body and headers")
     func postRequestWithBody() async throws {
-        let jsonData = Data("{\"name\":\"John\"}".utf8)
+        let jsonData = Array("{\"name\":\"John\"}".utf8)
         let request = try HTTP.Request(
             method: .post,
             target: .origin(path: .init("/users"), query: nil),
@@ -264,7 +263,7 @@ struct HTTPRequestMessageTests {
             headers: [
                 .init(name: "Content-Type", value: "application/json")
             ],
-            body: Data("test".utf8)
+            body: Array("test".utf8)
         )
 
         let encoder = JSONEncoder()

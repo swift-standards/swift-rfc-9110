@@ -1,7 +1,8 @@
 // HTTP.ContentLanguage.swift
 // swift-rfc-9110
 
-import Foundation
+import Standards
+import INCITS_4_1986
 
 extension HTTP {
     /// Content-Language header field (RFC 9110 Section 8.5)
@@ -52,7 +53,7 @@ extension HTTP {
         public static func parse(_ headerValue: String) -> [ContentLanguage] {
             return headerValue
                 .split(separator: ",")
-                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .map { $0.trimming(.whitespaces) }
                 .filter { !$0.isEmpty }
                 .map { ContentLanguage(String($0)) }
         }

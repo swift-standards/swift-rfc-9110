@@ -6,7 +6,8 @@
 //
 // Entity tags (ETags) are used for cache validation and conditional requests
 
-import Foundation
+import Standards
+import INCITS_4_1986
 
 extension RFC_9110 {
     /// HTTP Entity Tag (ETag) per RFC 9110 Section 8.8.3
@@ -107,7 +108,7 @@ extension RFC_9110 {
         /// EntityTag.parse("invalid")           // nil
         /// ```
         public static func parse(_ headerValue: String) -> EntityTag? {
-            let trimmed = headerValue.trimmingCharacters(in: .whitespaces)
+            let trimmed = headerValue.trimming(.whitespaces)
 
             // Check for weak prefix
             let isWeak: Bool

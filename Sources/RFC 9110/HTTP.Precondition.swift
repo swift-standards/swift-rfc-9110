@@ -1,7 +1,9 @@
 // HTTP.Precondition.swift
 // swift-rfc-9110
 
-import Foundation
+import RFC_5322
+import Standards
+import INCITS_4_1986
 
 extension HTTP {
     /// Conditional request preconditions (RFC 9110 Section 13)
@@ -44,14 +46,14 @@ extension HTTP {
         /// Used with GET/HEAD for cache validation.
         ///
         /// # RFC 9110 Section 13.1.3
-        case ifModifiedSince(Foundation.Date)
+        case ifModifiedSince(RFC_5322.DateTime)
 
         /// If-Unmodified-Since: Only perform the action if not modified since the specified date
         ///
         /// Used for updates to ensure the resource hasn't changed.
         ///
         /// # RFC 9110 Section 13.1.4
-        case ifUnmodifiedSince(Foundation.Date)
+        case ifUnmodifiedSince(RFC_5322.DateTime)
 
         /// If-Range: Make range request conditional on validator match
         ///
@@ -64,7 +66,7 @@ extension HTTP {
         /// A validator for If-Range precondition
         public enum Validator: Sendable, Equatable {
             case etag(HTTP.EntityTag)
-            case date(Foundation.Date)
+            case date(RFC_5322.DateTime)
         }
 
         /// Wildcard entity tag for matching any representation
@@ -107,16 +109,16 @@ extension HTTP.Precondition {
             return etags.map { $0.headerValue }.joined(separator: ", ")
 
         case .ifModifiedSince(let date):
-            return HTTP.Date(date).headerValue
+            return date.httpHeaderValue
 
         case .ifUnmodifiedSince(let date):
-            return HTTP.Date(date).headerValue
+            return date.httpHeaderValue
 
         case .ifRange(.etag(let etag)):
             return etag.headerValue
 
         case .ifRange(.date(let date)):
-            return HTTP.Date(date).headerValue
+            return date.httpHeaderValue
         }
     }
 }
@@ -129,7 +131,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Match header value
     /// - Returns: An If-Match precondition, or nil if parsing fails
     public static func parseIfMatch(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimmingCharacters(in: .whitespaces)
+        let trimmed = headerValue.trimming(.whitespaces)
 
         // Wildcard case
         if trimmed == "*" {
@@ -139,7 +141,7 @@ extension HTTP.Precondition {
         // Parse comma-separated ETags
         let etags = trimmed
             .split(separator: ",")
-            .compactMap { HTTP.EntityTag.parse(String($0.trimmingCharacters(in: .whitespaces))) }
+            .compactMap { HTTP.EntityTag.parse(String($0.trimming(.whitespaces))) }
 
         return etags.isEmpty ? nil : .ifMatch(etags)
     }
@@ -149,7 +151,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-None-Match header value
     /// - Returns: An If-None-Match precondition, or nil if parsing fails
     public static func parseIfNoneMatch(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimmingCharacters(in: .whitespaces)
+        let trimmed = headerValue.trimming(.whitespaces)
 
         // Wildcard case
         if trimmed == "*" {
@@ -159,7 +161,7 @@ extension HTTP.Precondition {
         // Parse comma-separated ETags
         let etags = trimmed
             .split(separator: ",")
-            .compactMap { HTTP.EntityTag.parse(String($0.trimmingCharacters(in: .whitespaces))) }
+            .compactMap { HTTP.EntityTag.parse(String($0.trimming(.whitespaces))) }
 
         return etags.isEmpty ? nil : .ifNoneMatch(etags)
     }
@@ -169,10 +171,10 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Modified-Since header value
     /// - Returns: An If-Modified-Since precondition, or nil if parsing fails
     public static func parseIfModifiedSince(_ headerValue: String) -> HTTP.Precondition? {
-        guard let httpDate = HTTP.Date.parse(headerValue) else {
+        guard let httpDate = HTTP.Date.parseHTTP(headerValue) else {
             return nil
         }
-        return .ifModifiedSince(httpDate.date)
+        return .ifModifiedSince(httpDate)
     }
 
     /// Parses an If-Unmodified-Since header value
@@ -180,10 +182,10 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Unmodified-Since header value
     /// - Returns: An If-Unmodified-Since precondition, or nil if parsing fails
     public static func parseIfUnmodifiedSince(_ headerValue: String) -> HTTP.Precondition? {
-        guard let httpDate = HTTP.Date.parse(headerValue) else {
+        guard let httpDate = HTTP.Date.parseHTTP(headerValue) else {
             return nil
         }
-        return .ifUnmodifiedSince(httpDate.date)
+        return .ifUnmodifiedSince(httpDate)
     }
 
     /// Parses an If-Range header value
@@ -191,7 +193,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Range header value
     /// - Returns: An If-Range precondition, or nil if parsing fails
     public static func parseIfRange(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimmingCharacters(in: .whitespaces)
+        let trimmed = headerValue.trimming(.whitespaces)
 
         // Try to parse as ETag first
         if let etag = HTTP.EntityTag.parse(trimmed) {
@@ -199,8 +201,8 @@ extension HTTP.Precondition {
         }
 
         // Try to parse as date
-        if let httpDate = HTTP.Date.parse(trimmed) {
-            return .ifRange(.date(httpDate.date))
+        if let httpDate = HTTP.Date.parseHTTP(trimmed) {
+            return .ifRange(.date(httpDate))
         }
 
         return nil
@@ -214,9 +216,9 @@ extension HTTP.Precondition {
     ///
     /// - Parameters:
     ///   - currentETag: The current entity tag of the resource, if any
-    ///   - lastModified: The last modified date of the resource, if any
+    ///   - lastModified: The last modified timestamp of the resource, if any
     /// - Returns: true if the precondition is satisfied, false otherwise
-    public func evaluate(currentETag: HTTP.EntityTag?, lastModified: Foundation.Date?) -> Bool {
+    public func evaluate(currentETag: HTTP.EntityTag?, lastModified: RFC_5322.DateTime?) -> Bool {
         switch self {
         case .ifMatch(let etags):
             guard let currentETag = currentETag else {
@@ -288,7 +290,7 @@ extension HTTP.Precondition.Validator: CustomStringConvertible {
         case .etag(let etag):
             return etag.description
         case .date(let date):
-            return HTTP.Date(date).description
+            return date.httpHeaderValue
         }
     }
 }

@@ -6,7 +6,8 @@
 //
 // Content coding values indicate an encoding transformation applied to the representation
 
-import Foundation
+import Standards
+import INCITS_4_1986
 
 extension RFC_9110 {
     /// HTTP Content Encoding (RFC 9110 Section 8.4)
@@ -82,8 +83,8 @@ extension RFC_9110 {
         /// ```
         public static func parse(_ headerValue: String) -> [ContentEncoding] {
             headerValue
-                .components(separatedBy: ",")
-                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .split(separator: ",")
+                .map { $0.trimming(.whitespaces) }
                 .filter { !$0.isEmpty }
                 .map { ContentEncoding($0) }
         }

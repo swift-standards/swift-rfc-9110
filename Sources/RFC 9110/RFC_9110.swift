@@ -16,7 +16,6 @@
 // - HTTP.MediaType - Media type handling
 // - HTTP.ContentNegotiation - Content negotiation
 
-import Foundation
 import OrderedCollections
 import RFC_3986
 

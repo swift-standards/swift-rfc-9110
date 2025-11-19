@@ -7,7 +7,6 @@
 //
 // HTTP request message semantics
 
-import Foundation
 import RFC_3986
 
 extension RFC_9110 {
@@ -86,7 +85,7 @@ extension RFC_9110 {
         /// Message body (optional per RFC 9110 Section 6.4)
         ///
         /// The message body (if any) carries the content of the request.
-        public var body: Data?
+        public var body: [UInt8]?
 
         // MARK: - Initialization
 
@@ -101,7 +100,7 @@ extension RFC_9110 {
             method: RFC_9110.Method,
             target: Target,
             headers: RFC_9110.Headers = [],
-            body: Data? = nil
+            body: [UInt8]? = nil
         ) {
             self.method = method
             self.target = target
@@ -130,13 +129,16 @@ extension RFC_9110 {
             userinfo: RFC_3986.URI.Userinfo? = nil,
             host: RFC_3986.URI.Host? = nil,
             port: RFC_3986.URI.Port? = nil,
-            path: RFC_3986.URI.Path = "/",
+            path: RFC_3986.URI.Path? = nil,
             query: RFC_3986.URI.Query? = nil,
             headers: RFC_9110.Headers = [],
-            body: Data? = nil
+            body: [UInt8]? = nil
         ) {
             // Determine request target form based on components
             let target: Target
+
+            // Default path to "/" if not provided
+            let effectivePath = path ?? (try! RFC_3986.URI.Path("/"))
 
             if let scheme = scheme, let host = host {
                 // Absolute-form: construct URI from components
@@ -149,7 +151,7 @@ extension RFC_9110 {
                 let uri = RFC_3986.URI(
                     scheme: scheme,
                     authority: authority,
-                    path: path,
+                    path: effectivePath,
                     query: query,
                     fragment: nil
                 )
@@ -157,7 +159,7 @@ extension RFC_9110 {
                 target = .absolute(uri)
             } else {
                 // Origin-form: just path and query
-                target = .origin(path: path, query: query)
+                target = .origin(path: effectivePath, query: query)
             }
 
             self.init(
@@ -540,20 +542,13 @@ extension RFC_9110.Request {
 
 extension RFC_9110.Request {
     /// Errors that occur during request validation
-    public enum ValidationError: Error, Sendable, LocalizedError {
+    public enum ValidationError: Error, Sendable {
         /// Invalid method for the request-target form
         case invalidMethodForTarget(
             method: RFC_9110.Method,
             target: Target,
             reason: String
         )
-
-        public var errorDescription: String? {
-            switch self {
-            case .invalidMethodForTarget(let method, let target, let reason):
-                return "Invalid method '\(method.rawValue)' for request-target '\(target)': \(reason)"
-            }
-        }
     }
 }
 
@@ -565,7 +560,7 @@ extension RFC_9110.Request {
         let method = try container.decode(RFC_9110.Method.self, forKey: .method)
         let target = try container.decode(RFC_9110.Request.Target.self, forKey: .target)
         let headers = try container.decodeIfPresent(RFC_9110.Headers.self, forKey: .headers) ?? []
-        let body = try container.decodeIfPresent(Data.self, forKey: .body)
+        let body = try container.decodeIfPresent([UInt8].self, forKey: .body)
 
         self.init(
             method: method,

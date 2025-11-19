@@ -7,7 +7,6 @@
 // The status code of a response is a three-digit integer code that
 // describes the result of the request and the semantics of the response.
 
-import Foundation
 
 extension RFC_9110 {
     /// HTTP Status Code (RFC 9110 Section 15)
@@ -69,6 +68,12 @@ extension RFC_9110.Status {
     /// Whether this is a server error status (5xx)
     public var isServerError: Bool {
         (500...599).contains(code)
+    }
+
+    /// Whether this is a final status code
+    /// RFC 9111: A final status code is any status code other than 1xx (informational)
+    public var isFinal: Bool {
+        !isInformational
     }
 }
  
