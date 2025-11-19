@@ -109,16 +109,16 @@ extension HTTP.Precondition {
             return etags.map { $0.headerValue }.joined(separator: ", ")
 
         case .ifModifiedSince(let date):
-            return date.httpHeaderValue
+            return String(date)
 
         case .ifUnmodifiedSince(let date):
-            return date.httpHeaderValue
+            return String(date)
 
         case .ifRange(.etag(let etag)):
             return etag.headerValue
 
         case .ifRange(.date(let date)):
-            return date.httpHeaderValue
+            return String(date)
         }
     }
 }
@@ -171,7 +171,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Modified-Since header value
     /// - Returns: An If-Modified-Since precondition, or nil if parsing fails
     public static func parseIfModifiedSince(_ headerValue: String) -> HTTP.Precondition? {
-        guard let httpDate = HTTP.Date.parseHTTP(headerValue) else {
+        guard let httpDate = try? RFC_5322.DateTime.Parser.parse(headerValue) else {
             return nil
         }
         return .ifModifiedSince(httpDate)
@@ -182,7 +182,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Unmodified-Since header value
     /// - Returns: An If-Unmodified-Since precondition, or nil if parsing fails
     public static func parseIfUnmodifiedSince(_ headerValue: String) -> HTTP.Precondition? {
-        guard let httpDate = HTTP.Date.parseHTTP(headerValue) else {
+        guard let httpDate = try? RFC_5322.DateTime.Parser.parse(headerValue) else {
             return nil
         }
         return .ifUnmodifiedSince(httpDate)
@@ -201,7 +201,7 @@ extension HTTP.Precondition {
         }
 
         // Try to parse as date
-        if let httpDate = HTTP.Date.parseHTTP(trimmed) {
+        if let httpDate = try? RFC_5322.DateTime.Parser.parse(trimmed) {
             return .ifRange(.date(httpDate))
         }
 
@@ -290,7 +290,7 @@ extension HTTP.Precondition.Validator: CustomStringConvertible {
         case .etag(let etag):
             return etag.description
         case .date(let date):
-            return date.httpHeaderValue
+            return String(date)
         }
     }
 }

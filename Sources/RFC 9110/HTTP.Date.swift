@@ -27,12 +27,12 @@ extension RFC_9110 {
     /// // Create from components
     /// let httpDate = HTTP.Date(year: 2025, month: 11, day: 16, hour: 21, minute: 30, second: 0)
     ///
-    /// // Format for headers
-    /// print(httpDate.httpHeaderValue)
-    /// // "Mon, 16 Nov 2025 21:30:00 +0000"
+    /// // Create header field from date
+    /// let field = HTTP.Header.Field(dateTime: httpDate)
+    /// // Field(name: "Date", value: "Mon, 16 Nov 2025 21:30:00 +0000")
     ///
-    /// // Parse from header
-    /// if let parsed = HTTP.Date.parseHTTP("Sun, 06 Nov 1994 08:49:37 +0000") {
+    /// // Parse from header field
+    /// if let parsed = RFC_5322.DateTime(field) {
     ///     print(parsed)
     /// }
     /// ```
@@ -59,39 +59,68 @@ extension RFC_9110 {
 
 // MARK: - HTTP-Specific Extensions
 
-extension RFC_5322.DateTime {
-    /// The HTTP header value representation (IMF-fixdate format)
-    ///
-    /// Format: `Day, DD Mon YYYY HH:MM:SS +0000`
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// let ts = HTTP.Date(year: 2025, month: 11, day: 16, hour: 21, minute: 30, second: 0)
-    /// print(ts.httpHeaderValue)
-    /// // "Mon, 16 Nov 2025 21:30:00 +0000"
-    /// ```
-    public var httpHeaderValue: String {
-        RFC_5322.Date.format(self)
-    }
+// MARK: - HTTP.Header.Field -> RFC_5322.DateTime
 
-    /// Parses an HTTP date from a header value
+extension RFC_5322.DateTime {
+    /// Creates an RFC 5322 DateTime from an HTTP header field value
     ///
+    /// Parses date headers like Date, Last-Modified, and Expires.
     /// Currently supports IMF-fixdate format (RFC 5322 format).
     ///
-    /// - Parameter headerValue: The date string to parse
-    /// - Returns: A Timestamp if parsing succeeds, nil otherwise
+    /// - Parameter field: The HTTP header field containing the date
     ///
     /// ## Example
     ///
     /// ```swift
-    /// HTTP.Date.parseHTTP("Sun, 06 Nov 1994 08:49:37 +0000")
+    /// let field = try HTTP.Header.Field(name: "Date", value: "Sun, 06 Nov 1994 08:49:37 +0000")
+    /// if let dateTime = RFC_5322.DateTime(field) {
+    ///     print(dateTime)
+    /// }
     /// ```
     ///
     /// ## Note
     ///
     /// Obsolete formats (RFC 850, asctime) are not yet supported.
-    public static func parseHTTP(_ headerValue: String) -> RFC_5322.DateTime? {
-        try? RFC_5322.Date.parse(headerValue)
+    public init?(_ field: RFC_9110.Header.Field) {
+        guard let parsed = try? RFC_5322.DateTime.Parser.parse(field.value.rawValue) else {
+            return nil
+        }
+        self = parsed
+    }
+
+    /// Creates an RFC 5322 DateTime from an HTTP header field value
+    ///
+    /// - Parameter value: The HTTP header field value containing the date
+    public init?(_ value: RFC_9110.Header.Field.Value) {
+        guard let parsed = try? RFC_5322.DateTime.Parser.parse(value.rawValue) else {
+            return nil
+        }
+        self = parsed
     }
 }
+
+// MARK: - RFC_5322.DateTime -> HTTP.Header.Field
+
+extension RFC_9110.Header.Field {
+    /// Creates a Date header field from an RFC 5322 DateTime
+    ///
+    /// Format: `Day, DD Mon YYYY HH:MM:SS +0000`
+    ///
+    /// - Parameter dateTime: The RFC 5322 DateTime to format
+    /// - Parameter name: The header name (default: "Date")
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// let dateTime = HTTP.Date(year: 2025, month: 11, day: 16, hour: 21, minute: 30, second: 0)
+    /// let field = HTTP.Header.Field(dateTime: dateTime)
+    /// // Field(name: "Date", value: "Mon, 16 Nov 2025 21:30:00 +0000")
+    /// ```
+    public init(dateTime: RFC_5322.DateTime, name: Name = .date) {
+        self.init(
+            name: name,
+            value: .init(unchecked: String(dateTime))
+        )
+    }
+}
+
