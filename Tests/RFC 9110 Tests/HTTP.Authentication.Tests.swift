@@ -4,13 +4,13 @@
 import Testing
 @testable import RFC_9110
 
-@Suite("HTTP.Authentication Tests")
-struct HTTPAuthenticationTests {
+@Suite
+struct `HTTP.Authentication Tests` {
 
     // MARK: - Scheme Tests
 
-    @Test("Authentication scheme creation")
-    func authenticationSchemeCreation() async throws {
+    @Test
+    func `Authentication scheme creation`() async throws {
         let basic = HTTP.Authentication.Scheme("Basic")
         #expect(basic.name == "Basic")
 
@@ -18,8 +18,8 @@ struct HTTPAuthenticationTests {
         #expect(custom.name == "CustomScheme")
     }
 
-    @Test("Standard authentication schemes")
-    func standardAuthenticationSchemes() async throws {
+    @Test
+    func `Standard authentication schemes`() async throws {
         #expect(HTTP.Authentication.Scheme.basic.name == "Basic")
         #expect(HTTP.Authentication.Scheme.bearer.name == "Bearer")
         #expect(HTTP.Authentication.Scheme.digest.name == "Digest")
@@ -27,8 +27,8 @@ struct HTTPAuthenticationTests {
         #expect(HTTP.Authentication.Scheme.oauth.name == "OAuth")
     }
 
-    @Test("Scheme equality (case-insensitive)")
-    func schemeEquality() async throws {
+    @Test
+    func `Scheme equality (case-insensitive)`() async throws {
         let basic1 = HTTP.Authentication.Scheme("Basic")
         let basic2 = HTTP.Authentication.Scheme("basic")
         let basic3 = HTTP.Authentication.Scheme("BASIC")
@@ -38,8 +38,8 @@ struct HTTPAuthenticationTests {
         #expect(basic1 == basic3)
     }
 
-    @Test("Scheme hashable (case-insensitive)")
-    func schemeHashable() async throws {
+    @Test
+    func `Scheme hashable (case-insensitive)`() async throws {
         var set: Set<HTTP.Authentication.Scheme> = []
         set.insert("Basic")
         set.insert("basic") // Should be same as Basic
@@ -50,8 +50,8 @@ struct HTTPAuthenticationTests {
 
     // MARK: - Challenge Tests
 
-    @Test("Challenge creation - simple")
-    func challengeCreationSimple() async throws {
+    @Test
+    func `Challenge creation - simple`() async throws {
         let challenge = HTTP.Authentication.Challenge(scheme: .basic)
 
         #expect(challenge.scheme == .basic)
@@ -59,16 +59,16 @@ struct HTTPAuthenticationTests {
         #expect(challenge.realm == nil)
     }
 
-    @Test("Challenge creation - with realm")
-    func challengeCreationWithRealm() async throws {
+    @Test
+    func `Challenge creation - with realm`() async throws {
         let challenge = HTTP.Authentication.Challenge(scheme: .basic, realm: "API Access")
 
         #expect(challenge.scheme == .basic)
         #expect(challenge.realm == "API Access")
     }
 
-    @Test("Challenge creation - with parameters")
-    func challengeCreationWithParameters() async throws {
+    @Test
+    func `Challenge creation - with parameters`() async throws {
         let challenge = HTTP.Authentication.Challenge(
             scheme: .bearer,
             parameters: ["realm": "example", "scope": "read write"]
@@ -79,15 +79,15 @@ struct HTTPAuthenticationTests {
         #expect(challenge.parameters["scope"] == "read write")
     }
 
-    @Test("Challenge header value - no parameters")
-    func challengeHeaderValueNoParameters() async throws {
+    @Test
+    func `Challenge header value - no parameters`() async throws {
         let challenge = HTTP.Authentication.Challenge(scheme: .basic)
 
         #expect(challenge.headerValue == "Basic")
     }
 
-    @Test("Challenge header value - with realm")
-    func challengeHeaderValueWithRealm() async throws {
+    @Test
+    func `Challenge header value - with realm`() async throws {
         let challenge = HTTP.Authentication.Challenge(scheme: .basic, realm: "API Access")
 
         let headerValue = challenge.headerValue
@@ -96,8 +96,8 @@ struct HTTPAuthenticationTests {
         #expect(headerValue.contains("API Access"))
     }
 
-    @Test("Challenge header value - multiple parameters")
-    func challengeHeaderValueMultipleParameters() async throws {
+    @Test
+    func `Challenge header value - multiple parameters`() async throws {
         let challenge = HTTP.Authentication.Challenge(
             scheme: .bearer,
             parameters: ["realm": "example", "scope": "read"]
@@ -109,24 +109,24 @@ struct HTTPAuthenticationTests {
         #expect(headerValue.contains("scope="))
     }
 
-    @Test("Challenge parsing - scheme only")
-    func challengeParsingSchemeOnly() async throws {
+    @Test
+    func `Challenge parsing - scheme only`() async throws {
         let challenge = HTTP.Authentication.Challenge.parse("Basic")
 
         #expect(challenge?.scheme == .basic)
         #expect(challenge?.parameters.isEmpty == true)
     }
 
-    @Test("Challenge parsing - with parameters")
-    func challengeParsingWithParameters() async throws {
+    @Test
+    func `Challenge parsing - with parameters`() async throws {
         let challenge = HTTP.Authentication.Challenge.parse("Basic realm=\"API Access\"")
 
         #expect(challenge?.scheme == .basic)
         #expect(challenge?.parameters["realm"] == "API Access")
     }
 
-    @Test("Challenge parsing - multiple parameters")
-    func challengeParsingMultipleParameters() async throws {
+    @Test
+    func `Challenge parsing - multiple parameters`() async throws {
         let challenge = HTTP.Authentication.Challenge.parse("Bearer realm=\"example\", scope=\"read write\"")
 
         #expect(challenge?.scheme == .bearer)
@@ -136,16 +136,16 @@ struct HTTPAuthenticationTests {
 
     // MARK: - Credentials Tests
 
-    @Test("Credentials creation")
-    func credentialsCreation() async throws {
+    @Test
+    func `Credentials creation`() async throws {
         let creds = HTTP.Authentication.Credentials(scheme: .bearer, token: "abc123")
 
         #expect(creds.scheme == .bearer)
         #expect(creds.token == "abc123")
     }
 
-    @Test("Credentials - basic authentication")
-    func credentialsBasic() async throws {
+    @Test
+    func `Credentials - basic authentication`() async throws {
         let creds = HTTP.Authentication.Credentials.basic(username: "user", password: "pass")
 
         #expect(creds.scheme == .basic)
@@ -158,16 +158,16 @@ struct HTTPAuthenticationTests {
         #expect(decodedString == "user:pass")
     }
 
-    @Test("Credentials - bearer token")
-    func credentialsBearer() async throws {
+    @Test
+    func `Credentials - bearer token`() async throws {
         let creds = HTTP.Authentication.Credentials.bearer("token123")
 
         #expect(creds.scheme == .bearer)
         #expect(creds.token == "token123")
     }
 
-    @Test("Credentials header value")
-    func credentialsHeaderValue() async throws {
+    @Test
+    func `Credentials header value`() async throws {
         let basic = HTTP.Authentication.Credentials.basic(username: "user", password: "pass")
         #expect(basic.headerValue.hasPrefix("Basic "))
 
@@ -175,24 +175,24 @@ struct HTTPAuthenticationTests {
         #expect(bearer.headerValue == "Bearer token123")
     }
 
-    @Test("Credentials parsing")
-    func credentialsParsing() async throws {
+    @Test
+    func `Credentials parsing`() async throws {
         let creds = HTTP.Authentication.Credentials.parse("Bearer abc123")
 
         #expect(creds?.scheme == .bearer)
         #expect(creds?.token == "abc123")
     }
 
-    @Test("Credentials parsing - with whitespace")
-    func credentialsParsingWhitespace() async throws {
+    @Test
+    func `Credentials parsing - with whitespace`() async throws {
         let creds = HTTP.Authentication.Credentials.parse("  Bearer   abc123  ")
 
         #expect(creds?.scheme == .bearer)
         #expect(creds?.token == "abc123")
     }
 
-    @Test("Credentials parsing - invalid")
-    func credentialsParsingInvalid() async throws {
+    @Test
+    func `Credentials parsing - invalid`() async throws {
         let invalid = HTTP.Authentication.Credentials.parse("InvalidFormat")
 
         #expect(invalid == nil)
@@ -200,8 +200,8 @@ struct HTTPAuthenticationTests {
 
     // MARK: - Codable Tests
 
-    @Test("Scheme codable")
-    func schemeCodable() async throws {
+    @Test
+    func `Scheme codable`() async throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
@@ -211,8 +211,8 @@ struct HTTPAuthenticationTests {
         #expect(decoded == .basic)
     }
 
-    @Test("Challenge codable")
-    func challengeCodable() async throws {
+    @Test
+    func `Challenge codable`() async throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
@@ -223,8 +223,8 @@ struct HTTPAuthenticationTests {
         #expect(decoded == challenge)
     }
 
-    @Test("Credentials codable")
-    func credentialsCodable() async throws {
+    @Test
+    func `Credentials codable`() async throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
@@ -237,14 +237,14 @@ struct HTTPAuthenticationTests {
 
     // MARK: - Description Tests
 
-    @Test("Scheme description")
-    func schemeDescription() async throws {
+    @Test
+    func `Scheme description`() async throws {
         #expect(HTTP.Authentication.Scheme.basic.description == "Basic")
         #expect(HTTP.Authentication.Scheme.bearer.description == "Bearer")
     }
 
-    @Test("Challenge description")
-    func challengeDescription() async throws {
+    @Test
+    func `Challenge description`() async throws {
         let challenge = HTTP.Authentication.Challenge(scheme: .basic, realm: "API")
         let description = challenge.description
 
@@ -252,16 +252,16 @@ struct HTTPAuthenticationTests {
         #expect(description.contains("realm"))
     }
 
-    @Test("Credentials description")
-    func credentialsDescription() async throws {
+    @Test
+    func `Credentials description`() async throws {
         let creds = HTTP.Authentication.Credentials.bearer("token123")
         #expect(creds.description == "Bearer token123")
     }
 
     // MARK: - String Literal Tests
 
-    @Test("Scheme string literal")
-    func schemeStringLiteral() async throws {
+    @Test
+    func `Scheme string literal`() async throws {
         let scheme: HTTP.Authentication.Scheme = "Basic"
         #expect(scheme == .basic)
     }

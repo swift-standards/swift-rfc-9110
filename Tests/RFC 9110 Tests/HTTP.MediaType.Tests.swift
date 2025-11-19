@@ -4,11 +4,11 @@
 import Testing
 @testable import RFC_9110
 
-@Suite("HTTP.MediaType Tests")
-struct HTTPMediaTypeTests {
+@Suite
+struct `HTTP.MediaType Tests` {
 
-    @Test("Media type creation")
-    func mediaTypeCreation() async throws {
+    @Test
+    func `Media type creation`() async throws {
         let json = HTTP.MediaType("application", "json")
 
         #expect(json.type == "application")
@@ -17,8 +17,8 @@ struct HTTPMediaTypeTests {
         #expect(json.value == "application/json")
     }
 
-    @Test("Media type with parameters")
-    func mediaTypeWithParameters() async throws {
+    @Test
+    func `Media type with parameters`() async throws {
         let html = HTTP.MediaType("text", "html", parameters: ["charset": "utf-8"])
 
         #expect(html.type == "text")
@@ -27,8 +27,8 @@ struct HTTPMediaTypeTests {
         #expect(html.value == "text/html; charset=utf-8")
     }
 
-    @Test("Media type normalization")
-    func mediaTypeNormalization() async throws {
+    @Test
+    func `Media type normalization`() async throws {
         let mt = HTTP.MediaType("TEXT", "HTML")
 
         // Type and subtype should be normalized to lowercase
@@ -36,8 +36,8 @@ struct HTTPMediaTypeTests {
         #expect(mt.subtype == "html")
     }
 
-    @Test("Media type parsing - simple")
-    func mediaTypeParsingSimple() async throws {
+    @Test
+    func `Media type parsing - simple`() async throws {
         let mt = HTTP.MediaType.parse("application/json")
 
         #expect(mt?.type == "application")
@@ -45,8 +45,8 @@ struct HTTPMediaTypeTests {
         #expect(mt?.parameters.isEmpty == true)
     }
 
-    @Test("Media type parsing - with parameters")
-    func mediaTypeParsingWithParameters() async throws {
+    @Test
+    func `Media type parsing - with parameters`() async throws {
         let mt = HTTP.MediaType.parse("text/html; charset=utf-8")
 
         #expect(mt?.type == "text")
@@ -54,8 +54,8 @@ struct HTTPMediaTypeTests {
         #expect(mt?.parameters["charset"] == "utf-8")
     }
 
-    @Test("Media type parsing - multiple parameters")
-    func mediaTypeParsingMultiple() async throws {
+    @Test
+    func `Media type parsing - multiple parameters`() async throws {
         let mt = HTTP.MediaType.parse("multipart/form-data; boundary=----WebKitFormBoundary; charset=utf-8")
 
         #expect(mt?.type == "multipart")
@@ -64,23 +64,23 @@ struct HTTPMediaTypeTests {
         #expect(mt?.parameters["charset"] == "utf-8")
     }
 
-    @Test("Media type parsing - quoted parameter")
-    func mediaTypeParsingQuoted() async throws {
+    @Test
+    func `Media type parsing - quoted parameter`() async throws {
         let mt = HTTP.MediaType.parse("text/html; charset=\"utf-8\"")
 
         #expect(mt?.parameters["charset"] == "utf-8")
     }
 
-    @Test("Media type parsing - invalid")
-    func mediaTypeParsingInvalid() async throws {
+    @Test
+    func `Media type parsing - invalid`() async throws {
         #expect(HTTP.MediaType.parse("invalid") == nil)
         #expect(HTTP.MediaType.parse("") == nil)
         #expect(HTTP.MediaType.parse("/json") == nil)
         #expect(HTTP.MediaType.parse("application/") == nil)
     }
 
-    @Test("Standard media types")
-    func standardMediaTypes() async throws {
+    @Test
+    func `Standard media types`() async throws {
         #expect(HTTP.MediaType.json.value == "application/json")
         #expect(HTTP.MediaType.html.value == "text/html")
         #expect(HTTP.MediaType.xml.value == "text/xml")
@@ -90,31 +90,31 @@ struct HTTPMediaTypeTests {
         #expect(HTTP.MediaType.jpeg.value == "image/jpeg")
     }
 
-    @Test("Media type matching - exact")
-    func mediaTypeMatchingExact() async throws {
+    @Test
+    func `Media type matching - exact`() async throws {
         let json = HTTP.MediaType.json
 
         #expect(json.matches("application/json"))
         #expect(!json.matches("text/html"))
     }
 
-    @Test("Media type matching - wildcard subtype")
-    func mediaTypeMatchingWildcardSubtype() async throws {
+    @Test
+    func `Media type matching - wildcard subtype`() async throws {
         let json = HTTP.MediaType.json
 
         #expect(json.matches("application/*"))
         #expect(!json.matches("text/*"))
     }
 
-    @Test("Media type matching - wildcard all")
-    func mediaTypeMatchingWildcardAll() async throws {
+    @Test
+    func `Media type matching - wildcard all`() async throws {
         let json = HTTP.MediaType.json
 
         #expect(json.matches("*/*"))
     }
 
-    @Test("Media type equality")
-    func mediaTypeEquality() async throws {
+    @Test
+    func `Media type equality`() async throws {
         let json1 = HTTP.MediaType.json
         let json2 = HTTP.MediaType("application", "json")
         let html = HTTP.MediaType.html
@@ -123,16 +123,16 @@ struct HTTPMediaTypeTests {
         #expect(json1 != html)
     }
 
-    @Test("Media type equality ignores parameters")
-    func mediaTypeEqualityIgnoresParameters() async throws {
+    @Test
+    func `Media type equality ignores parameters`() async throws {
         let html1 = HTTP.MediaType("text", "html")
         let html2 = HTTP.MediaType("text", "html", parameters: ["charset": "utf-8"])
 
         #expect(html1 == html2)
     }
 
-    @Test("Media type hashable")
-    func mediaTypeHashable() async throws {
+    @Test
+    func `Media type hashable`() async throws {
         var set: Set<HTTP.MediaType> = []
         set.insert(.json)
         set.insert(.html)
@@ -141,8 +141,8 @@ struct HTTPMediaTypeTests {
         #expect(set.count == 2)
     }
 
-    @Test("Media type codable")
-    func mediaTypeCodable() async throws {
+    @Test
+    func `Media type codable`() async throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
@@ -152,15 +152,15 @@ struct HTTPMediaTypeTests {
         #expect(decoded == .json)
     }
 
-    @Test("Media type string literal")
-    func mediaTypeStringLiteral() async throws {
+    @Test
+    func `Media type string literal`() async throws {
         let json: HTTP.MediaType = "application/json"
 
         #expect(json == .json)
     }
 
-    @Test("Media type description")
-    func mediaTypeDescription() async throws {
+    @Test
+    func `Media type description`() async throws {
         let json = HTTP.MediaType.json
         #expect(json.description == "application/json")
 

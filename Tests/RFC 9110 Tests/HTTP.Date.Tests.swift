@@ -5,19 +5,19 @@ import Testing
 import RFC_5322
 @testable import RFC_9110
 
-@Suite("HTTP.Date Tests")
-struct HTTPDateTests {
+@Suite
+struct `HTTP.Date Tests` {
 
-    @Test("Date creation")
-    func dateCreation() async throws {
+    @Test
+    func `Date creation`() async throws {
         let timestamp = 784111777.0 // Sun, 06 Nov 1994 08:49:37 GMT
         let httpDate = HTTP.Date(secondsSinceEpoch: timestamp)
 
         #expect(httpDate.secondsSinceEpoch == timestamp)
     }
 
-    @Test("Header value format - IMF-fixdate")
-    func headerValueFormat() async throws {
+    @Test
+    func `Header value format - IMF-fixdate`() async throws {
         let httpDate = HTTP.Date(secondsSinceEpoch: 784111777) // Sun, 06 Nov 1994 08:49:37 GMT
 
         let headerValue = httpDate.httpHeaderValue
@@ -29,8 +29,8 @@ struct HTTPDateTests {
         #expect(headerValue.contains("0000")) // GMT offset
     }
 
-    @Test("Parse IMF-fixdate format")
-    func parseIMFFixdate() async throws {
+    @Test
+    func `Parse IMF-fixdate format`() async throws {
         let parsed = HTTP.Date.parseHTTP("Sun, 06 Nov 1994 08:49:37 +0000")
 
         #expect(parsed != nil)
@@ -40,8 +40,8 @@ struct HTTPDateTests {
         #expect(diff < 1.0) // Within 1 second
     }
 
-    @Test("Parse RFC 850 format (obsolete)")
-    func parseRFC850() async throws {
+    @Test
+    func `Parse RFC 850 format (obsolete)`() async throws {
         // Note: RFC 850 format not yet supported
         let parsed = HTTP.Date.parseHTTP("Sunday, 06-Nov-94 08:49:37 GMT")
 
@@ -49,8 +49,8 @@ struct HTTPDateTests {
         #expect(parsed == nil)
     }
 
-    @Test("Parse asctime format (obsolete)")
-    func parseAsctime() async throws {
+    @Test
+    func `Parse asctime format (obsolete)`() async throws {
         // Note: asctime format not yet supported
         let parsed = HTTP.Date.parseHTTP("Sun Nov  6 08:49:37 1994")
 
@@ -58,15 +58,15 @@ struct HTTPDateTests {
         #expect(parsed == nil)
     }
 
-    @Test("Parse invalid date")
-    func parseInvalidDate() async throws {
+    @Test
+    func `Parse invalid date`() async throws {
         #expect(HTTP.Date.parseHTTP("invalid") == nil)
         #expect(HTTP.Date.parseHTTP("") == nil)
         #expect(HTTP.Date.parseHTTP("2024-11-16") == nil) // Wrong format
     }
 
-    @Test("Equality")
-    func equality() async throws {
+    @Test
+    func `Equality`() async throws {
         let date1 = HTTP.Date(secondsSinceEpoch: 784111777)
         let date2 = HTTP.Date(secondsSinceEpoch: 784111777)
         let date3 = HTTP.Date(secondsSinceEpoch: 784111778)
@@ -75,8 +75,8 @@ struct HTTPDateTests {
         #expect(date1 != date3)
     }
 
-    @Test("Hashable")
-    func hashable() async throws {
+    @Test
+    func `Hashable`() async throws {
         var set: Set<HTTP.Date> = []
 
         set.insert(HTTP.Date(secondsSinceEpoch: 784111777))
@@ -86,8 +86,8 @@ struct HTTPDateTests {
         #expect(set.count == 2)
     }
 
-    @Test("Comparable")
-    func comparable() async throws {
+    @Test
+    func `Comparable`() async throws {
         let earlier = HTTP.Date(secondsSinceEpoch: 1000)
         let later = HTTP.Date(secondsSinceEpoch: 2000)
 
@@ -95,8 +95,8 @@ struct HTTPDateTests {
         #expect(later > earlier)
     }
 
-    @Test("Codable")
-    func codable() async throws {
+    @Test
+    func `Codable`() async throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
@@ -108,8 +108,8 @@ struct HTTPDateTests {
         #expect(diff < 1.0) // Within 1 second
     }
 
-    @Test("Description")
-    func description() async throws {
+    @Test
+    func `Description`() async throws {
         let httpDate = HTTP.Date(secondsSinceEpoch: 784111777)
 
         let description = httpDate.description
@@ -119,8 +119,8 @@ struct HTTPDateTests {
         #expect(description.contains("784111777"))
     }
 
-    @Test("Round trip - format and parse")
-    func roundTrip() async throws {
+    @Test
+    func `Round trip - format and parse`() async throws {
         let original = HTTP.Date(secondsSinceEpoch: 784111777)
 
         let headerValue = original.httpHeaderValue

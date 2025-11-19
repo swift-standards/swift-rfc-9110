@@ -4,11 +4,11 @@
 import Testing
 @testable import RFC_9110
 
-@Suite("HTTP.ContentNegotiation Tests")
-struct HTTPContentNegotiationTests {
+@Suite
+struct `HTTP.ContentNegotiation Tests` {
 
-    @Test("Quality value creation")
-    func qualityValueCreation() async throws {
+    @Test
+    func `Quality value creation`() async throws {
         let q1 = HTTP.ContentNegotiation.QualityValue(1.0)
         #expect(q1.value == 1.0)
 
@@ -19,8 +19,8 @@ struct HTTPContentNegotiationTests {
         #expect(q05.value == 0.5)
     }
 
-    @Test("Quality value clamping")
-    func qualityValueClamping() async throws {
+    @Test
+    func `Quality value clamping`() async throws {
         let high = HTTP.ContentNegotiation.QualityValue(1.5)
         #expect(high.value == 1.0)
 
@@ -28,8 +28,8 @@ struct HTTPContentNegotiationTests {
         #expect(low.value == 0.0)
     }
 
-    @Test("Quality value parsing")
-    func qualityValueParsing() async throws {
+    @Test
+    func `Quality value parsing`() async throws {
         let q1 = HTTP.ContentNegotiation.QualityValue.parse("1.0")
         #expect(q1?.value == 1.0)
 
@@ -40,8 +40,8 @@ struct HTTPContentNegotiationTests {
         #expect(invalid == nil)
     }
 
-    @Test("Quality value comparison")
-    func qualityValueComparison() async throws {
+    @Test
+    func `Quality value comparison`() async throws {
         let q1 = HTTP.ContentNegotiation.QualityValue(1.0)
         let q05 = HTTP.ContentNegotiation.QualityValue(0.5)
         let q0 = HTTP.ContentNegotiation.QualityValue(0.0)
@@ -51,8 +51,8 @@ struct HTTPContentNegotiationTests {
         #expect(q0 < q1)
     }
 
-    @Test("Media type preference creation")
-    func mediaTypePreferenceCreation() async throws {
+    @Test
+    func `Media type preference creation`() async throws {
         let pref = HTTP.ContentNegotiation.MediaTypePreference(
             mediaType: .json,
             quality: HTTP.ContentNegotiation.QualityValue(0.9)
@@ -62,16 +62,16 @@ struct HTTPContentNegotiationTests {
         #expect(pref.quality.value == 0.9)
     }
 
-    @Test("Media type preference default quality")
-    func mediaTypePreferenceDefaultQuality() async throws {
+    @Test
+    func `Media type preference default quality`() async throws {
         let pref = HTTP.ContentNegotiation.MediaTypePreference(mediaType: .json)
 
         #expect(pref.quality == .default)
         #expect(pref.quality.value == 1.0)
     }
 
-    @Test("Media type preference parsing - simple")
-    func mediaTypePreferenceParsingSimple() async throws {
+    @Test
+    func `Media type preference parsing - simple`() async throws {
         let prefs = HTTP.ContentNegotiation.MediaTypePreference.parse("application/json")
 
         #expect(prefs.count == 1)
@@ -79,8 +79,8 @@ struct HTTPContentNegotiationTests {
         #expect(prefs[0].quality.value == 1.0)
     }
 
-    @Test("Media type preference parsing - with quality")
-    func mediaTypePreferenceParsingWithQuality() async throws {
+    @Test
+    func `Media type preference parsing - with quality`() async throws {
         let prefs = HTTP.ContentNegotiation.MediaTypePreference.parse("application/json;q=0.9")
 
         #expect(prefs.count == 1)
@@ -88,8 +88,8 @@ struct HTTPContentNegotiationTests {
         #expect(prefs[0].quality.value == 0.9)
     }
 
-    @Test("Media type preference parsing - multiple")
-    func mediaTypePreferenceParsingMultiple() async throws {
+    @Test
+    func `Media type preference parsing - multiple`() async throws {
         let prefs = HTTP.ContentNegotiation.MediaTypePreference.parse(
             "text/html, application/json;q=0.9, */*;q=0.1"
         )
@@ -107,8 +107,8 @@ struct HTTPContentNegotiationTests {
         #expect(prefs[2].quality.value == 0.1)
     }
 
-    @Test("Media type preference parsing - specificity")
-    func mediaTypePreferenceParsingSpecificity() async throws {
+    @Test
+    func `Media type preference parsing - specificity`() async throws {
         // When quality is the same, more specific types should come first
         let prefs = HTTP.ContentNegotiation.MediaTypePreference.parse(
             "*/*;q=0.5, application/*;q=0.5, application/json;q=0.5"
@@ -123,8 +123,8 @@ struct HTTPContentNegotiationTests {
         #expect(prefs[2].mediaType.type == "*")
     }
 
-    @Test("Select media type - exact match")
-    func selectMediaTypeExactMatch() async throws {
+    @Test
+    func `Select media type - exact match`() async throws {
         let available = [HTTP.MediaType.json, HTTP.MediaType.xml]
         let selected = HTTP.ContentNegotiation.selectMediaType(
             from: available,
@@ -134,8 +134,8 @@ struct HTTPContentNegotiationTests {
         #expect(selected == .json)
     }
 
-    @Test("Select media type - quality preference")
-    func selectMediaTypeQualityPreference() async throws {
+    @Test
+    func `Select media type - quality preference`() async throws {
         let available = [HTTP.MediaType.json, HTTP.MediaType.xml]
         let selected = HTTP.ContentNegotiation.selectMediaType(
             from: available,
@@ -145,8 +145,8 @@ struct HTTPContentNegotiationTests {
         #expect(selected == .json)
     }
 
-    @Test("Select media type - wildcard")
-    func selectMediaTypeWildcard() async throws {
+    @Test
+    func `Select media type - wildcard`() async throws {
         let available = [HTTP.MediaType.json, HTTP.MediaType.html]
         let selected = HTTP.ContentNegotiation.selectMediaType(
             from: available,
@@ -156,8 +156,8 @@ struct HTTPContentNegotiationTests {
         #expect(selected == .html)
     }
 
-    @Test("Select media type - wildcard all")
-    func selectMediaTypeWildcardAll() async throws {
+    @Test
+    func `Select media type - wildcard all`() async throws {
         let available = [HTTP.MediaType.json, HTTP.MediaType.html]
         let selected = HTTP.ContentNegotiation.selectMediaType(
             from: available,
@@ -168,8 +168,8 @@ struct HTTPContentNegotiationTests {
         #expect(selected == .json)
     }
 
-    @Test("Select media type - no match")
-    func selectMediaTypeNoMatch() async throws {
+    @Test
+    func `Select media type - no match`() async throws {
         let available = [HTTP.MediaType.json]
         let selected = HTTP.ContentNegotiation.selectMediaType(
             from: available,
@@ -179,8 +179,8 @@ struct HTTPContentNegotiationTests {
         #expect(selected == nil)
     }
 
-    @Test("Select media types - multiple")
-    func selectMediaTypesMultiple() async throws {
+    @Test
+    func `Select media types - multiple`() async throws {
         let available = [HTTP.MediaType.json, HTTP.MediaType.xml_app, HTTP.MediaType.html]
         let selected = HTTP.ContentNegotiation.selectMediaTypes(
             from: available,
@@ -193,8 +193,8 @@ struct HTTPContentNegotiationTests {
         #expect(selected[2] == .html)
     }
 
-    @Test("Select media types - wildcard")
-    func selectMediaTypesWildcard() async throws {
+    @Test
+    func `Select media types - wildcard`() async throws {
         let available = [HTTP.MediaType.json, HTTP.MediaType.xml, HTTP.MediaType.html]
         let selected = HTTP.ContentNegotiation.selectMediaTypes(
             from: available,
@@ -206,8 +206,8 @@ struct HTTPContentNegotiationTests {
         #expect(selected[0] == .json || selected[0] == .xml)
     }
 
-    @Test("Select media types - zero quality excluded")
-    func selectMediaTypesZeroQuality() async throws {
+    @Test
+    func `Select media types - zero quality excluded`() async throws {
         let available = [HTTP.MediaType.json, HTTP.MediaType.html]
         let selected = HTTP.ContentNegotiation.selectMediaTypes(
             from: available,
@@ -218,8 +218,8 @@ struct HTTPContentNegotiationTests {
         #expect(selected[0] == .json)
     }
 
-    @Test("Quality value description")
-    func qualityValueDescription() async throws {
+    @Test
+    func `Quality value description`() async throws {
         let q1 = HTTP.ContentNegotiation.QualityValue(1.0)
         #expect(q1.description == "1")
 
@@ -230,8 +230,8 @@ struct HTTPContentNegotiationTests {
         #expect(q0.description == "0")
     }
 
-    @Test("Media type preference description")
-    func mediaTypePreferenceDescription() async throws {
+    @Test
+    func `Media type preference description`() async throws {
         let pref1 = HTTP.ContentNegotiation.MediaTypePreference(mediaType: .json)
         #expect(pref1.description == "application/json")
 

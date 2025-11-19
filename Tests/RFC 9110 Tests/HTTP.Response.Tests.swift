@@ -4,11 +4,11 @@
 import Testing
 @testable import RFC_9110
 
-@Suite("HTTP.Response Tests")
-struct HTTPResponseMessageTests {
+@Suite
+struct `HTTP.Response Tests` {
 
-    @Test("Simple 200 OK response")
-    func simpleOkResponse() async throws {
+    @Test
+    func `Simple 200 OK response`() async throws {
         let response = HTTP.Response(
             status: .ok
         )
@@ -18,8 +18,8 @@ struct HTTPResponseMessageTests {
         #expect(response.body == nil)
     }
 
-    @Test("Response with headers and body")
-    func responseWithHeadersAndBody() async throws {
+    @Test
+    func `Response with headers and body`() async throws {
         let jsonData = Array("{\"message\":\"success\"}".utf8)
         let response = try HTTP.Response(
             status: .ok,
@@ -35,8 +35,8 @@ struct HTTPResponseMessageTests {
         #expect(response.headers["Content-Type"]?.first?.rawValue == "application/json")
     }
 
-    @Test("Header accessors")
-    func headerAccessors() async throws {
+    @Test
+    func `Header accessors`() async throws {
         let response = try HTTP.Response(
             status: .ok,
             headers: [
@@ -54,8 +54,8 @@ struct HTTPResponseMessageTests {
         #expect(firstCookie?.rawValue == "session=abc123")
     }
 
-    @Test("Adding headers")
-    func addingHeaders() async throws {
+    @Test
+    func `Adding headers`() async throws {
         let response = HTTP.Response(status: .ok)
 
         let withHeader = response.addingHeader(
@@ -66,8 +66,8 @@ struct HTTPResponseMessageTests {
         #expect(response.headers.count == 0) // Original unchanged
     }
 
-    @Test("Removing headers")
-    func removingHeaders() async throws {
+    @Test
+    func `Removing headers`() async throws {
         let response = try HTTP.Response(
             status: .ok,
             headers: [
@@ -83,8 +83,8 @@ struct HTTPResponseMessageTests {
         #expect(response.headers.count == 2) // Original unchanged
     }
 
-    @Test("Convenience constructor - ok()")
-    func convenienceOk() async throws {
+    @Test
+    func `Convenience constructor - ok()`() async throws {
         let response = HTTP.Response.ok(
             body: Array("success".utf8)
         )
@@ -93,8 +93,8 @@ struct HTTPResponseMessageTests {
         #expect(response.body == Array("success".utf8))
     }
 
-    @Test("Convenience constructor - created()")
-    func convenienceCreated() async throws {
+    @Test
+    func `Convenience constructor - created()`() async throws {
         let response = try HTTP.Response.created(
             location: "/users/123",
             body: Array("created".utf8)
@@ -105,16 +105,16 @@ struct HTTPResponseMessageTests {
         #expect(response.body == Array("created".utf8))
     }
 
-    @Test("Convenience constructor - noContent()")
-    func convenienceNoContent() async throws {
+    @Test
+    func `Convenience constructor - noContent()`() async throws {
         let response = HTTP.Response.noContent()
 
         #expect(response.status == .noContent)
         #expect(response.body == nil)
     }
 
-    @Test("Convenience constructor - movedPermanently()")
-    func convenienceMovedPermanently() async throws {
+    @Test
+    func `Convenience constructor - movedPermanently()`() async throws {
         let response = try HTTP.Response.movedPermanently(
             to: "https://newlocation.com"
         )
@@ -123,8 +123,8 @@ struct HTTPResponseMessageTests {
         #expect(response.headers["Location"]?.first?.rawValue == "https://newlocation.com")
     }
 
-    @Test("Convenience constructor - found()")
-    func convenienceFound() async throws {
+    @Test
+    func `Convenience constructor - found()`() async throws {
         let response = try HTTP.Response.found(
             at: "/temporary/location"
         )
@@ -133,8 +133,8 @@ struct HTTPResponseMessageTests {
         #expect(response.headers["Location"]?.first?.rawValue == "/temporary/location")
     }
 
-    @Test("Convenience constructor - seeOther()")
-    func convenienceSeeOther() async throws {
+    @Test
+    func `Convenience constructor - seeOther()`() async throws {
         let response = try HTTP.Response.seeOther(
             at: "/other/resource"
         )
@@ -143,8 +143,8 @@ struct HTTPResponseMessageTests {
         #expect(response.headers["Location"]?.first?.rawValue == "/other/resource")
     }
 
-    @Test("Convenience constructor - notModified()")
-    func convenienceNotModified() async throws {
+    @Test
+    func `Convenience constructor - notModified()`() async throws {
         let response = HTTP.Response.notModified(
             headers: try [
                 .init(name: "ETag", value: "\"abc123\"")
@@ -156,8 +156,8 @@ struct HTTPResponseMessageTests {
         #expect(response.headers["ETag"]?.first?.rawValue == "\"abc123\"")
     }
 
-    @Test("Convenience constructor - badRequest()")
-    func convenienceBadRequest() async throws {
+    @Test
+    func `Convenience constructor - badRequest()`() async throws {
         let response = HTTP.Response.badRequest(
             body: Array("Invalid request".utf8)
         )
@@ -166,8 +166,8 @@ struct HTTPResponseMessageTests {
         #expect(response.body == Array("Invalid request".utf8))
     }
 
-    @Test("Convenience constructor - unauthorized()")
-    func convenienceUnauthorized() async throws {
+    @Test
+    func `Convenience constructor - unauthorized()`() async throws {
         let response = try HTTP.Response.unauthorized(
             wwwAuthenticate: "Bearer realm=\"api\""
         )
@@ -176,15 +176,15 @@ struct HTTPResponseMessageTests {
         #expect(response.headers["WWW-Authenticate"]?.first?.rawValue == "Bearer realm=\"api\"")
     }
 
-    @Test("Convenience constructor - forbidden()")
-    func convenienceForbidden() async throws {
+    @Test
+    func `Convenience constructor - forbidden()`() async throws {
         let response = HTTP.Response.forbidden()
 
         #expect(response.status == .forbidden)
     }
 
-    @Test("Convenience constructor - notFound()")
-    func convenienceNotFound() async throws {
+    @Test
+    func `Convenience constructor - notFound()`() async throws {
         let response = HTTP.Response.notFound(
             body: Array("Not found".utf8)
         )
@@ -193,8 +193,8 @@ struct HTTPResponseMessageTests {
         #expect(response.body == Array("Not found".utf8))
     }
 
-    @Test("Convenience constructor - internalServerError()")
-    func convenienceInternalServerError() async throws {
+    @Test
+    func `Convenience constructor - internalServerError()`() async throws {
         let response = HTTP.Response.internalServerError(
             body: Array("Internal error".utf8)
         )
@@ -203,8 +203,8 @@ struct HTTPResponseMessageTests {
         #expect(response.body == Array("Internal error".utf8))
     }
 
-    @Test("Convenience constructor - serviceUnavailable()")
-    func convenienceServiceUnavailable() async throws {
+    @Test
+    func `Convenience constructor - serviceUnavailable()`() async throws {
         let response = try HTTP.Response.serviceUnavailable(
             retryAfter: "120"
         )
@@ -213,8 +213,8 @@ struct HTTPResponseMessageTests {
         #expect(response.headers["Retry-After"]?.first?.rawValue == "120")
     }
 
-    @Test("Response codable")
-    func responseCodable() async throws {
+    @Test
+    func `Response codable`() async throws {
         let response = try HTTP.Response(
             status: .ok,
             headers: [
@@ -232,8 +232,8 @@ struct HTTPResponseMessageTests {
         #expect(decoded == response)
     }
 
-    @Test("Response description")
-    func responseDescription() async throws {
+    @Test
+    func `Response description`() async throws {
         let response = try HTTP.Response(
             status: .ok,
             headers: [
@@ -248,8 +248,8 @@ struct HTTPResponseMessageTests {
         #expect(description.contains("[Body: 4 bytes]"))
     }
 
-    @Test("Response status category checks")
-    func statusCategoryChecks() async throws {
+    @Test
+    func `Response status category checks`() async throws {
         #expect(HTTP.Response.ok().status.isSuccessful)
         #expect(HTTP.Response.badRequest().status.isClientError)
         #expect(HTTP.Response.internalServerError().status.isServerError)

@@ -5,11 +5,11 @@ import Testing
 import RFC_3986
 @testable import RFC_9110
 
-@Suite("HTTP.Request.Target Tests")
-struct HTTPRequestTargetTests {
+@Suite
+struct `HTTP.Request.Target Tests` {
 
-    @Test("Origin-form request target")
-    func originForm() async throws {
+    @Test
+    func `Origin-form request target`() async throws {
         let target = HTTP.Request.Target.origin(
             path: try .init("/users/123"),
             query: try .init("page=1&limit=10")
@@ -22,8 +22,8 @@ struct HTTPRequestTargetTests {
         #expect(target.query?.string == "page=1&limit=10")
     }
 
-    @Test("Origin-form without query")
-    func originFormNoQuery() async throws {
+    @Test
+    func `Origin-form without query`() async throws {
         let target = HTTP.Request.Target.origin(
             path: try .init("/users"),
             query: nil
@@ -33,8 +33,8 @@ struct HTTPRequestTargetTests {
         #expect(target.query == nil)
     }
 
-    @Test("Absolute-form request target")
-    func absoluteForm() async throws {
+    @Test
+    func `Absolute-form request target`() async throws {
         let uri = try RFC_3986.URI("http://example.com/users?page=1")
         let target = HTTP.Request.Target.absolute(uri)
 
@@ -43,8 +43,8 @@ struct HTTPRequestTargetTests {
         #expect(target.isOriginForm == false)
     }
 
-    @Test("Authority-form request target")
-    func authorityForm() async throws {
+    @Test
+    func `Authority-form request target`() async throws {
         let authority = RFC_3986.URI.Authority(
             userinfo: nil,
             host: try .init("example.com"),
@@ -56,8 +56,8 @@ struct HTTPRequestTargetTests {
         #expect(target.isOriginForm == false)
     }
 
-    @Test("Asterisk-form request target")
-    func asteriskForm() async throws {
+    @Test
+    func `Asterisk-form request target`() async throws {
         let target = HTTP.Request.Target.asterisk
 
         #expect(target.rawValue == "*")
@@ -66,8 +66,8 @@ struct HTTPRequestTargetTests {
         #expect(target.query == nil)
     }
 
-    @Test("Request target codable")
-    func targetCodable() async throws {
+    @Test
+    func `Request target codable`() async throws {
         let target = HTTP.Request.Target.origin(
             path: try .init("/users"),
             query: try .init("page=1")
@@ -83,11 +83,11 @@ struct HTTPRequestTargetTests {
     }
 }
 
-@Suite("HTTP.Request Tests")
-struct HTTPRequestMessageTests {
+@Suite
+struct `HTTP.Request Tests` {
 
-    @Test("Simple GET request")
-    func simpleGetRequest() async throws {
+    @Test
+    func `Simple GET request`() async throws {
         let request = HTTP.Request(
             method: .get,
             target: .origin(path: try .init("/users"), query: nil)
@@ -99,8 +99,8 @@ struct HTTPRequestMessageTests {
         #expect(request.body == nil)
     }
 
-    @Test("POST request with body and headers")
-    func postRequestWithBody() async throws {
+    @Test
+    func `POST request with body and headers`() async throws {
         let jsonData = Array("{\"name\":\"John\"}".utf8)
         let request = try HTTP.Request(
             method: .post,
@@ -117,8 +117,8 @@ struct HTTPRequestMessageTests {
         #expect(request.headers["Content-Type"]?.first?.rawValue == "application/json")
     }
 
-    @Test("Convenience initializer with URI components")
-    func convenienceInitializer() async throws {
+    @Test
+    func `Convenience initializer with URI components`() async throws {
         let request = HTTP.Request(
             method: .get,
             scheme: try .init("https"),
@@ -134,8 +134,8 @@ struct HTTPRequestMessageTests {
         #expect(request.query?.string == "page=1")
     }
 
-    @Test("Header accessors")
-    func headerAccessors() async throws {
+    @Test
+    func `Header accessors`() async throws {
         let request = try HTTP.Request(
             method: .get,
             target: .origin(path: .init("/"), query: nil),
@@ -158,8 +158,8 @@ struct HTTPRequestMessageTests {
         #expect(missing == nil)
     }
 
-    @Test("Adding headers")
-    func addingHeaders() async throws {
+    @Test
+    func `Adding headers`() async throws {
         let request = HTTP.Request(
             method: .get,
             target: .origin(path: try .init("/"), query: nil)
@@ -173,8 +173,8 @@ struct HTTPRequestMessageTests {
         #expect(request.headers.count == 0) // Original unchanged
     }
 
-    @Test("Removing headers")
-    func removingHeaders() async throws {
+    @Test
+    func `Removing headers`() async throws {
         let request = try HTTP.Request(
             method: .get,
             target: .origin(path: .init("/"), query: nil),
@@ -191,8 +191,8 @@ struct HTTPRequestMessageTests {
         #expect(request.headers.count == 2) // Original unchanged
     }
 
-    @Test("Request validation - CONNECT with authority-form")
-    func validationConnectAuthority() async throws {
+    @Test
+    func `Request validation - CONNECT with authority-form`() async throws {
         let request = HTTP.Request(
             method: .connect,
             target: .authority(
@@ -207,8 +207,8 @@ struct HTTPRequestMessageTests {
         try request.validate() // Should not throw
     }
 
-    @Test("Request validation - CONNECT with wrong target form")
-    func validationConnectWrongTarget() async throws {
+    @Test
+    func `Request validation - CONNECT with wrong target form`() async throws {
         let request = HTTP.Request(
             method: .connect,
             target: .origin(path: try .init("/"), query: nil)
@@ -226,8 +226,8 @@ struct HTTPRequestMessageTests {
         }
     }
 
-    @Test("Request validation - OPTIONS with asterisk-form")
-    func validationOptionsAsterisk() async throws {
+    @Test
+    func `Request validation - OPTIONS with asterisk-form`() async throws {
         let request = HTTP.Request(
             method: .options,
             target: .asterisk
@@ -236,8 +236,8 @@ struct HTTPRequestMessageTests {
         try request.validate() // Should not throw
     }
 
-    @Test("Request validation - OPTIONS with wrong target form")
-    func validationOptionsWrongTarget() async throws {
+    @Test
+    func `Request validation - OPTIONS with wrong target form`() async throws {
         let request = HTTP.Request(
             method: .get,
             target: .asterisk
@@ -255,8 +255,8 @@ struct HTTPRequestMessageTests {
         }
     }
 
-    @Test("Request codable")
-    func requestCodable() async throws {
+    @Test
+    func `Request codable`() async throws {
         let request = try HTTP.Request(
             method: .post,
             target: .origin(path: .init("/users"), query: nil),
@@ -275,8 +275,8 @@ struct HTTPRequestMessageTests {
         #expect(decoded == request)
     }
 
-    @Test("Request description")
-    func requestDescription() async throws {
+    @Test
+    func `Request description`() async throws {
         let request = try HTTP.Request(
             method: .get,
             target: .origin(path: .init("/users"), query: .init("page=1")),

@@ -4,11 +4,11 @@
 import Testing
 @testable import RFC_9110
 
-@Suite("HTTP.Status Tests")
-struct HTTPStatusTests {
+@Suite
+struct `HTTP.Status Tests` {
 
-    @Test("Status code properties")
-    func statusCodeProperties() async throws {
+    @Test
+    func `Status code properties`() async throws {
         // Informational 1xx
         #expect(HTTP.Status.continue.isInformational == true)
         #expect(HTTP.Status.continue.code == 100)
@@ -37,15 +37,15 @@ struct HTTPStatusTests {
         #expect(HTTP.Status.serviceUnavailable.isServerError == true)
     }
 
-    @Test("Status equality based on code")
-    func statusEquality() async throws {
+    @Test
+    func `Status equality based on code`() async throws {
         #expect(HTTP.Status.ok == HTTP.Status(200))
         #expect(HTTP.Status.ok == HTTP.Status(200, "OK"))
         #expect(HTTP.Status.ok != HTTP.Status.created)
     }
 
-    @Test("Status hashable")
-    func statusHashable() async throws {
+    @Test
+    func `Status hashable`() async throws {
         var set: Set<HTTP.Status> = []
         set.insert(.ok)
         set.insert(.created)
@@ -56,8 +56,8 @@ struct HTTPStatusTests {
         #expect(set.contains(.created))
     }
 
-    @Test("Status codable")
-    func statusCodable() async throws {
+    @Test
+    func `Status codable`() async throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
@@ -68,28 +68,28 @@ struct HTTPStatusTests {
         #expect(decoded.code == 200)
     }
 
-    @Test("Custom status code")
-    func customStatusCode() async throws {
+    @Test
+    func `Custom status code`() async throws {
         let custom = HTTP.Status(999, "Custom")
         #expect(custom.code == 999)
         #expect(custom.reasonPhrase == "Custom")
     }
 
-    @Test("Integer literal")
-    func integerLiteral() async throws {
+    @Test
+    func `Integer literal`() async throws {
         let status: HTTP.Status = 200
         #expect(status.code == 200)
         #expect(status == .ok)
     }
 
-    @Test("Description")
-    func description() async throws {
+    @Test
+    func `Description`() async throws {
         #expect(HTTP.Status.ok.description == "200 OK")
         #expect(HTTP.Status(200).description == "200")
     }
 
-    @Test("All standard status codes")
-    func allStandardStatusCodes() async throws {
+    @Test
+    func `All standard status codes`() async throws {
         // Just verify they exist and have correct codes
         #expect(HTTP.Status.continue.code == 100)
         #expect(HTTP.Status.switchingProtocols.code == 101)

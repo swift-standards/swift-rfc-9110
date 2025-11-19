@@ -4,11 +4,11 @@
 import Testing
 @testable import RFC_9110
 
-@Suite("HTTP.Header.Field Tests")
-struct HTTPHeaderFieldTests {
+@Suite
+struct `HTTP.Header.Field Tests` {
 
-    @Test("Field name case insensitivity")
-    func fieldNameCaseInsensitivity() async throws {
+    @Test
+    func `Field name case insensitivity`() async throws {
         let name1 = HTTP.Header.Field.Name("Content-Type")
         let name2 = HTTP.Header.Field.Name("content-type")
         let name3 = HTTP.Header.Field.Name("CONTENT-TYPE")
@@ -18,8 +18,8 @@ struct HTTPHeaderFieldTests {
         #expect(name1 == name3)
     }
 
-    @Test("Field name hashable with case insensitivity")
-    func fieldNameHashable() async throws {
+    @Test
+    func `Field name hashable with case insensitivity`() async throws {
         var set: Set<HTTP.Header.Field.Name> = []
         set.insert("Content-Type")
         set.insert("content-type") // Same as above
@@ -28,8 +28,8 @@ struct HTTPHeaderFieldTests {
         #expect(set.count == 2)
     }
 
-    @Test("Field value validation - valid values")
-    func fieldValueValid() async throws {
+    @Test
+    func `Field value validation - valid values`() async throws {
         // Valid values should not throw
         _ = try HTTP.Header.Field.Value("application/json")
         _ = try HTTP.Header.Field.Value("text/html; charset=utf-8")
@@ -37,8 +37,8 @@ struct HTTPHeaderFieldTests {
         _ = try HTTP.Header.Field.Value("")
     }
 
-    @Test("Field value validation - reject CR")
-    func fieldValueRejectCR() async throws {
+    @Test
+    func `Field value validation - reject CR`() async throws {
         do {
             _ = try HTTP.Header.Field.Value("value\rtest")
             Issue.record("Should have thrown for CR character")
@@ -52,8 +52,8 @@ struct HTTPHeaderFieldTests {
         }
     }
 
-    @Test("Field value validation - reject LF")
-    func fieldValueRejectLF() async throws {
+    @Test
+    func `Field value validation - reject LF`() async throws {
         do {
             _ = try HTTP.Header.Field.Value("value\ntest")
             Issue.record("Should have thrown for LF character")
@@ -67,8 +67,8 @@ struct HTTPHeaderFieldTests {
         }
     }
 
-    @Test("Field value validation - reject CRLF injection")
-    func fieldValueRejectCRLF() async throws {
+    @Test
+    func `Field value validation - reject CRLF injection`() async throws {
         do {
             _ = try HTTP.Header.Field.Value("value\r\nX-Injected: malicious")
             Issue.record("Should have thrown for CRLF injection")
@@ -77,15 +77,15 @@ struct HTTPHeaderFieldTests {
         }
     }
 
-    @Test("Field value unchecked init")
-    func fieldValueUnchecked() async throws {
+    @Test
+    func `Field value unchecked init`() async throws {
         // Unchecked init should not validate
         let value = HTTP.Header.Field.Value(unchecked: "value\r\ntest")
         #expect(value.rawValue == "value\r\ntest")
     }
 
-    @Test("Field creation")
-    func fieldCreation() async throws {
+    @Test
+    func `Field creation`() async throws {
         let field = try HTTP.Header.Field(
             name: "Content-Type",
             value: "application/json"
@@ -95,8 +95,8 @@ struct HTTPHeaderFieldTests {
         #expect(field.value.rawValue == "application/json")
     }
 
-    @Test("Field description")
-    func fieldDescription() async throws {
+    @Test
+    func `Field description`() async throws {
         let field = try HTTP.Header.Field(
             name: "Content-Type",
             value: "application/json"
@@ -105,8 +105,8 @@ struct HTTPHeaderFieldTests {
         #expect(field.description == "Content-Type: application/json")
     }
 
-    @Test("Field codable")
-    func fieldCodable() async throws {
+    @Test
+    func `Field codable`() async throws {
         let field = try HTTP.Header.Field(
             name: "Content-Type",
             value: "application/json"
@@ -121,8 +121,8 @@ struct HTTPHeaderFieldTests {
         #expect(decoded == field)
     }
 
-    @Test("Standard header names")
-    func standardHeaderNames() async throws {
+    @Test
+    func `Standard header names`() async throws {
         #expect(HTTP.Header.Field.Name.contentType.rawValue == "Content-Type")
         #expect(HTTP.Header.Field.Name.accept.rawValue == "Accept")
         #expect(HTTP.Header.Field.Name.authorization.rawValue == "Authorization")
@@ -131,11 +131,11 @@ struct HTTPHeaderFieldTests {
     }
 }
 
-@Suite("HTTP.Headers Tests")
-struct HTTPHeadersTests {
+@Suite
+struct `HTTP.Headers Tests` {
 
-    @Test("Headers initialization")
-    func headersInit() async throws {
+    @Test
+    func `Headers initialization`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json"),
             .init(name: "Accept", value: "application/json")
@@ -145,8 +145,8 @@ struct HTTPHeadersTests {
         #expect(!headers.isEmpty)
     }
 
-    @Test("Headers subscript access (case-insensitive)")
-    func headersSubscript() async throws {
+    @Test
+    func `Headers subscript access (case-insensitive)`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json")
         ])
@@ -157,8 +157,8 @@ struct HTTPHeadersTests {
         #expect(headers["Accept"] == nil)
     }
 
-    @Test("Headers with multiple values")
-    func headersMultipleValues() async throws {
+    @Test
+    func `Headers with multiple values`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Accept", value: "application/json"),
             .init(name: "Accept", value: "text/html")
@@ -170,8 +170,8 @@ struct HTTPHeadersTests {
         #expect(acceptValues?[1].rawValue == "text/html")
     }
 
-    @Test("Headers append")
-    func headersAppend() async throws {
+    @Test
+    func `Headers append`() async throws {
         var headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json")
         ])
@@ -185,8 +185,8 @@ struct HTTPHeadersTests {
         #expect(headers["Accept"]?.count == 2)
     }
 
-    @Test("Headers removeAll")
-    func headersRemoveAll() async throws {
+    @Test
+    func `Headers removeAll`() async throws {
         var headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json"),
             .init(name: "Accept", value: "application/json")
@@ -198,8 +198,8 @@ struct HTTPHeadersTests {
         #expect(headers["Accept"] != nil)
     }
 
-    @Test("Headers sequence")
-    func headersSequence() async throws {
+    @Test
+    func `Headers sequence`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json"),
             .init(name: "Accept", value: "text/html"),
@@ -214,8 +214,8 @@ struct HTTPHeadersTests {
         #expect(acceptFields.count == 2)
     }
 
-    @Test("Headers contains")
-    func headersContains() async throws {
+    @Test
+    func `Headers contains`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json")
         ])
@@ -225,8 +225,8 @@ struct HTTPHeadersTests {
         #expect(!headers.contains("Accept"))
     }
 
-    @Test("Headers first")
-    func headersFirst() async throws {
+    @Test
+    func `Headers first`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Accept", value: "application/json"),
             .init(name: "Accept", value: "text/html")
@@ -236,8 +236,8 @@ struct HTTPHeadersTests {
         #expect(headers.first("Content-Type") == nil)
     }
 
-    @Test("Headers values")
-    func headersValues() async throws {
+    @Test
+    func `Headers values`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Accept", value: "application/json"),
             .init(name: "Accept", value: "text/html")
@@ -250,8 +250,8 @@ struct HTTPHeadersTests {
         #expect(emptyValues.isEmpty)
     }
 
-    @Test("Headers codable")
-    func headersCodable() async throws {
+    @Test
+    func `Headers codable`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json"),
             .init(name: "Accept", value: "text/html")

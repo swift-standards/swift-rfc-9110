@@ -4,11 +4,11 @@
 import Testing
 @testable import RFC_9110
 
-@Suite("HTTP.Method Tests")
-struct HTTPMethodTests {
+@Suite
+struct `HTTP.Method Tests` {
 
-    @Test("Standard methods have correct properties")
-    func standardMethodProperties() async throws {
+    @Test
+    func `Standard methods have correct properties`() async throws {
         // GET - safe, idempotent, cacheable
         #expect(HTTP.Method.get.isSafe == true)
         #expect(HTTP.Method.get.isIdempotent == true)
@@ -55,14 +55,14 @@ struct HTTPMethodTests {
         #expect(HTTP.Method.patch.isCacheable == false)
     }
 
-    @Test("Method equality based on rawValue")
-    func methodEquality() async throws {
+    @Test
+    func `Method equality based on rawValue`() async throws {
         #expect(HTTP.Method.get == HTTP.Method("GET", isSafe: true, isIdempotent: true, isCacheable: true))
         #expect(HTTP.Method.post != HTTP.Method.get)
     }
 
-    @Test("Method hashable")
-    func methodHashable() async throws {
+    @Test
+    func `Method hashable`() async throws {
         var set: Set<HTTP.Method> = []
         set.insert(.get)
         set.insert(.post)
@@ -73,8 +73,8 @@ struct HTTPMethodTests {
         #expect(set.contains(.post))
     }
 
-    @Test("Method codable")
-    func methodCodable() async throws {
+    @Test
+    func `Method codable`() async throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
@@ -85,8 +85,8 @@ struct HTTPMethodTests {
         #expect(decoded.isSafe == true)
     }
 
-    @Test("Custom method")
-    func customMethod() async throws {
+    @Test
+    func `Custom method`() async throws {
         let custom = HTTP.Method(rawValue: "CUSTOM")
         #expect(custom.rawValue == "CUSTOM")
         #expect(custom.isSafe == false)
@@ -94,14 +94,14 @@ struct HTTPMethodTests {
         #expect(custom.isCacheable == false)
     }
 
-    @Test("String literal")
-    func stringLiteral() async throws {
+    @Test
+    func `String literal`() async throws {
         let method: HTTP.Method = "CUSTOM"
         #expect(method.rawValue == "CUSTOM")
     }
 
-    @Test("Description")
-    func description() async throws {
+    @Test
+    func `Description`() async throws {
         #expect(HTTP.Method.get.description == "GET")
         #expect(HTTP.Method.post.description == "POST")
     }
