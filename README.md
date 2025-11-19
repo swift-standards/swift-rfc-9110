@@ -109,7 +109,7 @@ let response = try HTTP.Response.Message.created(
 
 ```swift
 dependencies: [
-    .package(path: "../swift-rfc-9110")
+    .package(url: "https://github.com/swift-standards/swift-rfc-9110", from: "0.1.0")
 ],
 targets: [
     .target(

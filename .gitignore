@@ -1,13 +1,23 @@
-# Swift Package Manager
-.build/
-.swiftpm/
+*~
+
 Package.resolved
-
-# Xcode
-*.xcodeproj
-*.xcworkspace
-xcuserdata/
 DerivedData/
+Thumbs.db
 
-# macOS
-.DS_Store
+# Dot files/directories (opt-in only)
+/.*
+!/.github
+!/.gitignore
+!/.spi.yml
+!/.swift-format
+!/.swiftformat
+!/.swiftlint.yml
+
+# Documentation (opt-in for top-level .md files only)
+/*.md
+!README.md
+!LICENSE.md
+!CHANGELOG.md
+!CONTRIBUTING.md
+!CODE_OF_CONDUCT.md
+!SECURITY.md
