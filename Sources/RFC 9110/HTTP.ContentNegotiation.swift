@@ -156,7 +156,7 @@ extension RFC_9110.ContentNegotiation {
             var preferences: [MediaTypePreference] = []
 
             for component in components {
-                let trimmed = component.trimming(.whitespaces)
+                let trimmed = component.trimming(.ascii.whitespaces)
 
                 // Split on semicolon to separate media type from parameters
                 let parts = trimmed.split(separator: ";")
@@ -168,7 +168,7 @@ extension RFC_9110.ContentNegotiation {
                 // Look for q parameter
                 var quality = QualityValue.default
                 for part in parts.dropFirst() {
-                    let param = part.trimming(.whitespaces)
+                    let param = part.trimming(.ascii.whitespaces)
                     if param.hasPrefix("q=") {
                         let qValue = String(param.dropFirst(2))
                         if let parsed = QualityValue.parse(qValue) {
@@ -366,11 +366,11 @@ extension RFC_9110.ContentNegotiation {
             var preferences: [EncodingPreference] = []
             
             for component in components {
-                let trimmed = component.trimming(.whitespaces)
+                let trimmed = component.trimming(.ascii.whitespaces)
 
                 // Split on semicolon to separate encoding from quality
                 let parts = trimmed.split(separator: ";")
-                guard let encodingString = parts.first?.trimming(.whitespaces),
+                guard let encodingString = parts.first?.trimming(.ascii.whitespaces),
                       !encodingString.isEmpty else {
                     continue
                 }
@@ -380,7 +380,7 @@ extension RFC_9110.ContentNegotiation {
                 // Look for q parameter
                 var quality = QualityValue.default
                 for part in parts.dropFirst() {
-                    let param = part.trimming(.whitespaces)
+                    let param = part.trimming(.ascii.whitespaces)
                     if param.hasPrefix("q=") {
                         let qValue = String(param.dropFirst(2))
                         if let parsed = QualityValue.parse(qValue) {
@@ -458,11 +458,11 @@ extension RFC_9110.ContentNegotiation {
             var preferences: [LanguagePreference] = []
             
             for component in components {
-                let trimmed = component.trimming(.whitespaces)
+                let trimmed = component.trimming(.ascii.whitespaces)
 
                 // Split on semicolon to separate language from quality
                 let parts = trimmed.split(separator: ";")
-                guard let language = parts.first?.trimming(.whitespaces),
+                guard let language = parts.first?.trimming(.ascii.whitespaces),
                       !language.isEmpty else {
                     continue
                 }
@@ -470,7 +470,7 @@ extension RFC_9110.ContentNegotiation {
                 // Look for q parameter
                 var quality = QualityValue.default
                 for part in parts.dropFirst() {
-                    let param = part.trimming(.whitespaces)
+                    let param = part.trimming(.ascii.whitespaces)
                     if param.hasPrefix("q=") {
                         let qValue = String(param.dropFirst(2))
                         if let parsed = QualityValue.parse(qValue) {
@@ -559,11 +559,11 @@ extension RFC_9110.ContentNegotiation {
             var preferences: [CharsetPreference] = []
             
             for component in components {
-                let trimmed = component.trimming(.whitespaces)
+                let trimmed = component.trimming(.ascii.whitespaces)
 
                 // Split on semicolon to separate charset from quality
                 let parts = trimmed.split(separator: ";")
-                guard let charset = parts.first?.trimming(.whitespaces),
+                guard let charset = parts.first?.trimming(.ascii.whitespaces),
                       !charset.isEmpty else {
                     continue
                 }
@@ -571,7 +571,7 @@ extension RFC_9110.ContentNegotiation {
                 // Look for q parameter
                 var quality = QualityValue.default
                 for part in parts.dropFirst() {
-                    let param = part.trimming(.whitespaces)
+                    let param = part.trimming(.ascii.whitespaces)
                     if param.hasPrefix("q=") {
                         let qValue = String(param.dropFirst(2))
                         if let parsed = QualityValue.parse(qValue) {

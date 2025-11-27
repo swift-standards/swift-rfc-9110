@@ -7,7 +7,7 @@
 //
 // HTTP request message semantics
 
-import RFC_3986
+public import RFC_3986
 
 extension RFC_9110 {
     /// HTTP request message per RFC 9110 Section 9
@@ -288,7 +288,7 @@ extension RFC_9110 {
             case .authority:
                 // authority-form is only used with CONNECT
                 guard method == .connect else {
-                    throw ValidationError.invalidMethodForTarget(
+                    throw Error.invalidMethodForTarget(
                         method: method,
                         target: target,
                         reason: "authority-form can only be used with CONNECT method (RFC 9110 §7.1)"
@@ -298,7 +298,7 @@ extension RFC_9110 {
             case .asterisk:
                 // asterisk-form is only used with OPTIONS
                 guard method == .options else {
-                    throw ValidationError.invalidMethodForTarget(
+                    throw Error.invalidMethodForTarget(
                         method: method,
                         target: target,
                         reason: "asterisk-form can only be used with OPTIONS method (RFC 9110 §7.1)"
@@ -308,7 +308,7 @@ extension RFC_9110 {
             case .origin, .absolute:
                 // CONNECT can only be used with authority-form
                 if method == .connect {
-                    throw ValidationError.invalidMethodForTarget(
+                    throw Error.invalidMethodForTarget(
                         method: method,
                         target: target,
                         reason: "CONNECT method can only be used with authority-form (RFC 9110 §7.1)"
@@ -542,7 +542,7 @@ extension RFC_9110.Request {
 
 extension RFC_9110.Request {
     /// Errors that occur during request validation
-    public enum ValidationError: Error, Sendable {
+    public enum Error: Swift.Error, Sendable {
         /// Invalid method for the request-target form
         case invalidMethodForTarget(
             method: RFC_9110.Method,

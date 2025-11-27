@@ -53,7 +53,7 @@ extension HTTP {
         public static func parse(_ headerValue: String) -> [ContentLanguage] {
             return headerValue
                 .split(separator: ",")
-                .map { $0.trimming(.whitespaces) }
+                .map { $0.trimming(.ascii.whitespaces) }
                 .filter { !$0.isEmpty }
                 .map { ContentLanguage(String($0)) }
         }

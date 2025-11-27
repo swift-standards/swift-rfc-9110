@@ -84,7 +84,7 @@ extension RFC_9110 {
         public static func parse(_ headerValue: String) -> [ContentEncoding] {
             headerValue
                 .split(separator: ",")
-                .map { $0.trimming(.whitespaces) }
+                .map { $0.trimming(.ascii.whitespaces) }
                 .filter { !$0.isEmpty }
                 .map { ContentEncoding($0) }
         }

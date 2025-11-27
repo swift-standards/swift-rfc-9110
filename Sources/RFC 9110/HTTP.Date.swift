@@ -6,7 +6,7 @@
 //
 // HTTP date/time values in RFC 5322 format
 
-import RFC_5322
+public import RFC_5322
 
 extension RFC_9110 {
     /// HTTP Date/Time (RFC 9110 Section 5.6.7)

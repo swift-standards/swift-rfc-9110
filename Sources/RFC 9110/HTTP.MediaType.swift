@@ -98,14 +98,14 @@ extension RFC_9110 {
         /// // mt?.parameters["charset"] == "utf-8"
         /// ```
         public static func parse(_ string: String) -> MediaType? {
-            let trimmed = string.trimming(.whitespaces)
+            let trimmed = string.trimming(.ascii.whitespaces)
 
             // Split on first semicolon to separate type/subtype from parameters
             let components = trimmed.split(separator: ";")
             guard let firstComponent = components.first else { return nil }
 
             // Parse type/subtype
-            let typeComponents = firstComponent.trimming(.whitespaces)
+            let typeComponents = firstComponent.trimming(.ascii.whitespaces)
                 .split(separator: "/")
             guard typeComponents.count == 2,
                   !typeComponents[0].isEmpty,
@@ -113,8 +113,8 @@ extension RFC_9110 {
                 return nil
             }
 
-            let type = typeComponents[0].trimming(.whitespaces)
-            let subtype = typeComponents[1].trimming(.whitespaces)
+            let type = typeComponents[0].trimming(.ascii.whitespaces)
+            let subtype = typeComponents[1].trimming(.ascii.whitespaces)
 
             // Parse parameters
             var parameters: [String: String] = [:]
@@ -123,8 +123,8 @@ extension RFC_9110 {
                     let paramParts = param.split(separator: "=")
                     guard paramParts.count == 2 else { continue }
 
-                    let key = paramParts[0].trimming(.whitespaces).lowercased()
-                    var value = paramParts[1].trimming(.whitespaces)
+                    let key = paramParts[0].trimming(.ascii.whitespaces).lowercased()
+                    var value = paramParts[1].trimming(.ascii.whitespaces)
 
                     // Remove quotes if present
                     if value.hasPrefix("\"") && value.hasSuffix("\"") {

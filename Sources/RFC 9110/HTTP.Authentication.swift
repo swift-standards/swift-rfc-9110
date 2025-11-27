@@ -161,7 +161,7 @@ extension RFC_9110.Authentication {
         /// - Parameter headerValue: The WWW-Authenticate header value
         /// - Returns: A Challenge if parsing succeeds, nil otherwise
         public static func parse(_ headerValue: String) -> Challenge? {
-            let trimmed = headerValue.trimming(.whitespaces)
+            let trimmed = headerValue.trimming(.ascii.whitespaces)
 
             // Extract scheme (first token)
             guard let spaceIndex = trimmed.firstIndex(of: " ") else {
@@ -179,13 +179,13 @@ extension RFC_9110.Authentication {
             // Simple parameter parsing (doesn't handle all edge cases)
             let paramComponents = paramsString.split(separator: ",")
             for component in paramComponents {
-                let trimmedComponent = component.trimming(.whitespaces)
+                let trimmedComponent = component.trimming(.ascii.whitespaces)
                 let parts = trimmedComponent.split(separator: "=")
 
                 guard parts.count == 2 else { continue }
 
-                let key = parts[0].trimming(.whitespaces)
-                var value = parts[1].trimming(.whitespaces)
+                let key = parts[0].trimming(.ascii.whitespaces)
+                var value = parts[1].trimming(.ascii.whitespaces)
 
                 // Remove quotes if present
                 if value.hasPrefix("\"") && value.hasSuffix("\"") {
@@ -262,7 +262,7 @@ extension RFC_9110.Authentication {
         /// - Parameter headerValue: The Authorization header value
         /// - Returns: Credentials if parsing succeeds, nil otherwise
         public static func parse(_ headerValue: String) -> Credentials? {
-            let trimmed = headerValue.trimming(.whitespaces)
+            let trimmed = headerValue.trimming(.ascii.whitespaces)
 
             guard let spaceIndex = trimmed.firstIndex(of: " ") else {
                 return nil
@@ -272,7 +272,7 @@ extension RFC_9110.Authentication {
             let scheme = Scheme(schemeName)
 
             let token = String(trimmed[trimmed.index(after: spaceIndex)...])
-                .trimming(.whitespaces)
+                .trimming(.ascii.whitespaces)
 
             return Credentials(scheme: scheme, token: token)
         }

@@ -1,7 +1,7 @@
 // HTTP.Precondition.swift
 // swift-rfc-9110
 
-import RFC_5322
+public import RFC_5322
 import Standards
 import INCITS_4_1986
 
@@ -131,7 +131,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Match header value
     /// - Returns: An If-Match precondition, or nil if parsing fails
     public static func parseIfMatch(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimming(.whitespaces)
+        let trimmed = headerValue.trimming(.ascii.whitespaces)
 
         // Wildcard case
         if trimmed == "*" {
@@ -141,7 +141,7 @@ extension HTTP.Precondition {
         // Parse comma-separated ETags
         let etags = trimmed
             .split(separator: ",")
-            .compactMap { HTTP.EntityTag.parse(String($0.trimming(.whitespaces))) }
+            .compactMap { HTTP.EntityTag.parse(String($0.trimming(.ascii.whitespaces))) }
 
         return etags.isEmpty ? nil : .ifMatch(etags)
     }
@@ -151,7 +151,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-None-Match header value
     /// - Returns: An If-None-Match precondition, or nil if parsing fails
     public static func parseIfNoneMatch(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimming(.whitespaces)
+        let trimmed = headerValue.trimming(.ascii.whitespaces)
 
         // Wildcard case
         if trimmed == "*" {
@@ -161,7 +161,7 @@ extension HTTP.Precondition {
         // Parse comma-separated ETags
         let etags = trimmed
             .split(separator: ",")
-            .compactMap { HTTP.EntityTag.parse(String($0.trimming(.whitespaces))) }
+            .compactMap { HTTP.EntityTag.parse(String($0.trimming(.ascii.whitespaces))) }
 
         return etags.isEmpty ? nil : .ifNoneMatch(etags)
     }
@@ -193,7 +193,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Range header value
     /// - Returns: An If-Range precondition, or nil if parsing fails
     public static func parseIfRange(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimming(.whitespaces)
+        let trimmed = headerValue.trimming(.ascii.whitespaces)
 
         // Try to parse as ETag first
         if let etag = HTTP.EntityTag.parse(trimmed) {

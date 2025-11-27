@@ -108,7 +108,7 @@ extension RFC_9110 {
         /// EntityTag.parse("invalid")           // nil
         /// ```
         public static func parse(_ headerValue: String) -> EntityTag? {
-            let trimmed = headerValue.trimming(.whitespaces)
+            let trimmed = headerValue.trimming(.ascii.whitespaces)
 
             // Check for weak prefix
             let isWeak: Bool

@@ -198,14 +198,14 @@ extension RFC_9110.Header.Field {
             // RFC 9110 Section 5.5: field-content cannot contain CR or LF
             // Check for CR (U+000D) and LF (U+000A) characters
             if rawValue.unicodeScalars.contains(where: { $0 == "\r" }) {
-                throw ValidationError.invalidFieldValue(
+                throw Error.invalidFieldValue(
                     value: rawValue,
                     reason: "Header field value contains CR (carriage return) character, forbidden by RFC 9110 §5.5"
                 )
             }
 
             if rawValue.unicodeScalars.contains(where: { $0 == "\n" }) {
-                throw ValidationError.invalidFieldValue(
+                throw Error.invalidFieldValue(
                     value: rawValue,
                     reason: "Header field value contains LF (line feed) character, forbidden by RFC 9110 §5.5"
                 )
@@ -230,7 +230,7 @@ extension RFC_9110.Header.Field {
 
 extension RFC_9110.Header.Field {
     /// Errors that occur during header field validation
-    public enum ValidationError: Error, Sendable {
+    public enum Error: Swift.Error, Sendable {
         /// The header field value is invalid
         case invalidFieldValue(value: String, reason: String)
     }
