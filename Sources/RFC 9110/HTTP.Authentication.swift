@@ -375,7 +375,7 @@ extension RFC_9110.Authentication.Credentials {
     public static func basic(username: String, password: String) -> RFC_9110.Authentication.Credentials {
         let combined = "\(username):\(password)"
         let bytes = Array(combined.utf8)
-        let encoded = String(base64Encoding: bytes)
+        let encoded = String.base64(bytes)
         return Self(scheme: .basic, token: encoded)
     }
 

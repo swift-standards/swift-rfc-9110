@@ -171,7 +171,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Modified-Since header value
     /// - Returns: An If-Modified-Since precondition, or nil if parsing fails
     public static func parseIfModifiedSince(_ headerValue: String) -> HTTP.Precondition? {
-        guard let httpDate = try? RFC_5322.DateTime.Parser.parse(headerValue) else {
+        guard let httpDate = try? RFC_5322.DateTime(ascii: headerValue.utf8) else {
             return nil
         }
         return .ifModifiedSince(httpDate)
@@ -182,7 +182,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Unmodified-Since header value
     /// - Returns: An If-Unmodified-Since precondition, or nil if parsing fails
     public static func parseIfUnmodifiedSince(_ headerValue: String) -> HTTP.Precondition? {
-        guard let httpDate = try? RFC_5322.DateTime.Parser.parse(headerValue) else {
+        guard let httpDate = try? RFC_5322.DateTime(ascii: headerValue.utf8) else {
             return nil
         }
         return .ifUnmodifiedSince(httpDate)
@@ -201,7 +201,7 @@ extension HTTP.Precondition {
         }
 
         // Try to parse as date
-        if let httpDate = try? RFC_5322.DateTime.Parser.parse(trimmed) {
+        if let httpDate = try? RFC_5322.DateTime(ascii: trimmed.utf8) {
             return .ifRange(.date(httpDate))
         }
 

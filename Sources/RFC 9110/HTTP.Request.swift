@@ -458,9 +458,9 @@ extension RFC_9110.Request {
             switch self {
             case .origin(let path, let query):
                 if let query = query, !query.isEmpty {
-                    return "\(path.string)?\(query.string)"
+                    return "\(path.description)?\(query.description)"
                 } else {
-                    return path.string
+                    return path.description
                 }
 
             case .absolute(let uri):
