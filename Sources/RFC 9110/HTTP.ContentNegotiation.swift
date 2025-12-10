@@ -6,8 +6,8 @@
 //
 // Proactive content negotiation mechanisms
 
-import Standards
 import INCITS_4_1986
+import Standards
 
 extension RFC_9110 {
     /// HTTP Content Negotiation (RFC 9110 Section 12)
@@ -161,7 +161,8 @@ extension RFC_9110.ContentNegotiation {
                 // Split on semicolon to separate media type from parameters
                 let parts = trimmed.split(separator: ";")
                 guard let typeSubtype = parts.first,
-                      let mediaType = RFC_9110.MediaType.parse(String(typeSubtype)) else {
+                    let mediaType = RFC_9110.MediaType.parse(String(typeSubtype))
+                else {
                     continue
                 }
 
@@ -282,7 +283,8 @@ extension RFC_9110.ContentNegotiation {
         }
 
         // Sort by quality (descending)
-        return results
+        return
+            results
             .sorted { $0.1 > $1.1 }
             .map { $0.0 }
     }
@@ -335,10 +337,10 @@ extension RFC_9110.ContentNegotiation {
     public struct EncodingPreference: Sendable, Equatable {
         /// The content encoding
         public let encoding: RFC_9110.ContentEncoding
-        
+
         /// The quality value (defaults to 1.0)
         public let quality: QualityValue
-        
+
         /// Creates an encoding preference
         ///
         /// - Parameters:
@@ -348,7 +350,7 @@ extension RFC_9110.ContentNegotiation {
             self.encoding = encoding
             self.quality = quality
         }
-        
+
         /// Parses encoding preferences from an Accept-Encoding header value
         ///
         /// - Parameter headerValue: The Accept-Encoding header value
@@ -364,14 +366,15 @@ extension RFC_9110.ContentNegotiation {
         public static func parse(_ headerValue: String) -> [EncodingPreference] {
             let components = headerValue.split(separator: ",")
             var preferences: [EncodingPreference] = []
-            
+
             for component in components {
                 let trimmed = component.trimming(.ascii.whitespaces)
 
                 // Split on semicolon to separate encoding from quality
                 let parts = trimmed.split(separator: ";")
                 guard let encodingString = parts.first?.trimming(.ascii.whitespaces),
-                      !encodingString.isEmpty else {
+                    !encodingString.isEmpty
+                else {
                     continue
                 }
 
@@ -388,10 +391,10 @@ extension RFC_9110.ContentNegotiation {
                         }
                     }
                 }
-                
+
                 preferences.append(EncodingPreference(encoding: encoding, quality: quality))
             }
-            
+
             // Sort by quality (descending)
             return preferences.sorted { $0.quality > $1.quality }
         }
@@ -427,10 +430,10 @@ extension RFC_9110.ContentNegotiation {
     public struct LanguagePreference: Sendable, Equatable {
         /// The language tag (e.g., "en-US", "fr", "de")
         public let language: String
-        
+
         /// The quality value (defaults to 1.0)
         public let quality: QualityValue
-        
+
         /// Creates a language preference
         ///
         /// - Parameters:
@@ -440,7 +443,7 @@ extension RFC_9110.ContentNegotiation {
             self.language = language
             self.quality = quality
         }
-        
+
         /// Parses language preferences from an Accept-Language header value
         ///
         /// - Parameter headerValue: The Accept-Language header value
@@ -456,14 +459,15 @@ extension RFC_9110.ContentNegotiation {
         public static func parse(_ headerValue: String) -> [LanguagePreference] {
             let components = headerValue.split(separator: ",")
             var preferences: [LanguagePreference] = []
-            
+
             for component in components {
                 let trimmed = component.trimming(.ascii.whitespaces)
 
                 // Split on semicolon to separate language from quality
                 let parts = trimmed.split(separator: ";")
                 guard let language = parts.first?.trimming(.ascii.whitespaces),
-                      !language.isEmpty else {
+                    !language.isEmpty
+                else {
                     continue
                 }
 
@@ -478,10 +482,10 @@ extension RFC_9110.ContentNegotiation {
                         }
                     }
                 }
-                
+
                 preferences.append(LanguagePreference(language: language, quality: quality))
             }
-            
+
             // Sort by quality (descending), then by specificity
             return preferences.sorted { lhs, rhs in
                 if lhs.quality.value != rhs.quality.value {
@@ -528,10 +532,10 @@ extension RFC_9110.ContentNegotiation {
     public struct CharsetPreference: Sendable, Equatable {
         /// The charset name (e.g., "utf-8", "iso-8859-1")
         public let charset: String
-        
+
         /// The quality value (defaults to 1.0)
         public let quality: QualityValue
-        
+
         /// Creates a charset preference
         ///
         /// - Parameters:
@@ -541,7 +545,7 @@ extension RFC_9110.ContentNegotiation {
             self.charset = charset.lowercased()
             self.quality = quality
         }
-        
+
         /// Parses charset preferences from an Accept-Charset header value
         ///
         /// - Parameter headerValue: The Accept-Charset header value
@@ -557,14 +561,15 @@ extension RFC_9110.ContentNegotiation {
         public static func parse(_ headerValue: String) -> [CharsetPreference] {
             let components = headerValue.split(separator: ",")
             var preferences: [CharsetPreference] = []
-            
+
             for component in components {
                 let trimmed = component.trimming(.ascii.whitespaces)
 
                 // Split on semicolon to separate charset from quality
                 let parts = trimmed.split(separator: ";")
                 guard let charset = parts.first?.trimming(.ascii.whitespaces),
-                      !charset.isEmpty else {
+                    !charset.isEmpty
+                else {
                     continue
                 }
 
@@ -579,10 +584,10 @@ extension RFC_9110.ContentNegotiation {
                         }
                     }
                 }
-                
+
                 preferences.append(CharsetPreference(charset: charset, quality: quality))
             }
-            
+
             // Sort by quality (descending)
             return preferences.sorted { $0.quality > $1.quality }
         }

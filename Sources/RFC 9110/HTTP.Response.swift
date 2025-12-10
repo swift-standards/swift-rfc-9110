@@ -54,15 +54,15 @@ extension RFC_9110 {
     /// - [RFC 9110 Section 15: Status Codes](https://www.rfc-editor.org/rfc/rfc9110.html#section-15)
     public struct Response: Sendable, Equatable, Hashable, Codable {
         // MARK: - Status Line Components
-        
+
         /// HTTP status code (required per RFC 9110 Section 15)
         ///
         /// The status-code element is a three-digit integer code describing
         /// the result of the server's attempt to understand and satisfy the request.
         public var status: RFC_9110.Status
-        
+
         // MARK: - Message Components
-        
+
         /// Header fields (case-insensitive per RFC 9110 Section 5.1)
         ///
         /// Each header field consists of a case-insensitive field name followed by a
@@ -70,7 +70,7 @@ extension RFC_9110 {
         ///
         /// Use subscript for convenient access: `response.headers["content-type"]?.first`
         public var headers: RFC_9110.Headers
-        
+
         /// Message body (optional per RFC 9110 Section 6.4)
         ///
         /// The message body (if any) carries the content of the response.
@@ -97,9 +97,9 @@ extension RFC_9110 {
 }
 
 extension RFC_9110.Response {
-    
+
     // MARK: - Convenience Accessors
-    
+
     /// Gets the value(s) of a header field by name
     ///
     /// - Parameter name: The header field name (case-insensitive)
@@ -109,7 +109,7 @@ extension RFC_9110.Response {
     public func header(_ name: RFC_9110.Header.Field.Name) -> [RFC_9110.Header.Field.Value] {
         headers[name.rawValue] ?? []
     }
-    
+
     /// Gets the first value of a header field by name
     ///
     /// - Parameter name: The header field name (case-insensitive)
@@ -117,7 +117,7 @@ extension RFC_9110.Response {
     public func firstHeader(_ name: RFC_9110.Header.Field.Name) -> RFC_9110.Header.Field.Value? {
         headers[name.rawValue]?.first
     }
-    
+
     /// Adds a header field
     ///
     /// - Parameter field: The header field to add
@@ -127,7 +127,7 @@ extension RFC_9110.Response {
         copy.headers.append(field)
         return copy
     }
-    
+
     /// Removes all header fields with the given name
     ///
     /// - Parameter name: The header field name to remove (case-insensitive)
@@ -138,7 +138,6 @@ extension RFC_9110.Response {
         return copy
     }
 }
-
 
 // MARK: - Codable
 
@@ -209,19 +208,20 @@ extension RFC_9110.Response: CustomDebugStringConvertible {
     /// )
     /// ```
     public var debugDescription: String {
-        let statusLine = if let reasonPhrase = status.reasonPhrase {
-            "\(status.code) \(reasonPhrase)"
-        } else {
-            "\(status.code)"
-        }
+        let statusLine =
+            if let reasonPhrase = status.reasonPhrase {
+                "\(status.code) \(reasonPhrase)"
+            } else {
+                "\(status.code)"
+            }
 
         return """
-        HTTP.Response(
-          status: \(statusLine)
-          headers: \(headers.count) field\(headers.count == 1 ? "" : "s")
-          body: \(body?.count ?? 0) bytes
-        )
-        """
+            HTTP.Response(
+              status: \(statusLine)
+              headers: \(headers.count) field\(headers.count == 1 ? "" : "s")
+              body: \(body?.count ?? 0) bytes
+            )
+            """
     }
 }
 

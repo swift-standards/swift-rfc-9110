@@ -7,7 +7,6 @@
 // The status code of a response is a three-digit integer code that
 // describes the result of the request and the semantics of the response.
 
-
 extension RFC_9110 {
     /// HTTP Status Code (RFC 9110 Section 15)
     ///
@@ -22,13 +21,13 @@ extension RFC_9110 {
     public struct Status: Hashable, Sendable, Codable {
         /// The three-digit status code
         public let code: Int
-        
+
         /// The optional reason phrase
         ///
         /// RFC 9110 allows custom reason phrases, though they are optional
         /// and clients SHOULD ignore them.
         public let reasonPhrase: String?
-        
+
         /// Creates a status with a code and optional reason phrase
         ///
         /// - Parameters:
@@ -42,29 +41,29 @@ extension RFC_9110 {
 }
 
 extension RFC_9110.Status {
-    
+
     // MARK: - Status Code Properties
-    
+
     /// Whether this is an informational status (1xx)
     public var isInformational: Bool {
         (100...199).contains(code)
     }
-    
+
     /// Whether this is a successful status (2xx)
     public var isSuccessful: Bool {
         (200...299).contains(code)
     }
-    
+
     /// Whether this is a redirection status (3xx)
     public var isRedirection: Bool {
         (300...399).contains(code)
     }
-    
+
     /// Whether this is a client error status (4xx)
     public var isClientError: Bool {
         (400...499).contains(code)
     }
-    
+
     /// Whether this is a server error status (5xx)
     public var isServerError: Bool {
         (500...599).contains(code)
@@ -76,34 +75,33 @@ extension RFC_9110.Status {
         !isInformational
     }
 }
- 
+
 extension RFC_9110.Status {
     // MARK: - Equatable
-    
+
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.code == rhs.code
     }
-    
+
     // MARK: - Hashable
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(code)
     }
-    
+
     // MARK: - Codable
-    
+
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         self.code = try container.decode(Int.self)
         self.reasonPhrase = nil
     }
-    
+
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(code)
     }
 }
-
 
 // MARK: - CustomStringConvertible
 

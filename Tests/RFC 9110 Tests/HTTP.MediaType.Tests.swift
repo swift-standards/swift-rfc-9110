@@ -2,6 +2,7 @@
 // swift-rfc-9110
 
 import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -56,7 +57,9 @@ struct `HTTP.MediaType Tests` {
 
     @Test
     func `Media type parsing - multiple parameters`() async throws {
-        let mt = HTTP.MediaType.parse("multipart/form-data; boundary=----WebKitFormBoundary; charset=utf-8")
+        let mt = HTTP.MediaType.parse(
+            "multipart/form-data; boundary=----WebKitFormBoundary; charset=utf-8"
+        )
 
         #expect(mt?.type == "multipart")
         #expect(mt?.subtype == "form-data")
@@ -136,7 +139,7 @@ struct `HTTP.MediaType Tests` {
         var set: Set<HTTP.MediaType> = []
         set.insert(.json)
         set.insert(.html)
-        set.insert(.json) // duplicate
+        set.insert(.json)  // duplicate
 
         #expect(set.count == 2)
     }

@@ -6,8 +6,8 @@
 //
 // Entity tags (ETags) are used for cache validation and conditional requests
 
-import Standards
 import INCITS_4_1986
+import Standards
 
 extension RFC_9110 {
     /// HTTP Entity Tag (ETag) per RFC 9110 Section 8.8.3
@@ -116,7 +116,7 @@ extension RFC_9110 {
 
             if trimmed.hasPrefix("W/\"") {
                 isWeak = true
-                tagPart = String(trimmed.dropFirst(2)) // Remove "W/"
+                tagPart = String(trimmed.dropFirst(2))  // Remove "W/"
             } else if trimmed.hasPrefix("\"") {
                 isWeak = false
                 tagPart = trimmed

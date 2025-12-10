@@ -2,6 +2,7 @@
 // swift-rfc-9110
 
 import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -57,7 +58,10 @@ struct `HTTP.Method Tests` {
 
     @Test
     func `Method equality based on rawValue`() async throws {
-        #expect(HTTP.Method.get == HTTP.Method("GET", isSafe: true, isIdempotent: true, isCacheable: true))
+        #expect(
+            HTTP.Method.get
+                == HTTP.Method("GET", isSafe: true, isIdempotent: true, isCacheable: true)
+        )
         #expect(HTTP.Method.post != HTTP.Method.get)
     }
 
@@ -66,7 +70,7 @@ struct `HTTP.Method Tests` {
         var set: Set<HTTP.Method> = []
         set.insert(.get)
         set.insert(.post)
-        set.insert(.get) // duplicate
+        set.insert(.get)  // duplicate
 
         #expect(set.count == 2)
         #expect(set.contains(.get))

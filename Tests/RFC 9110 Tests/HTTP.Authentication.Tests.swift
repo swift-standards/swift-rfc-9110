@@ -2,6 +2,7 @@
 // swift-rfc-9110
 
 import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -42,7 +43,7 @@ struct `HTTP.Authentication Tests` {
     func `Scheme hashable (case-insensitive)`() async throws {
         var set: Set<HTTP.Authentication.Scheme> = []
         set.insert("Basic")
-        set.insert("basic") // Should be same as Basic
+        set.insert("basic")  // Should be same as Basic
         set.insert("Bearer")
 
         #expect(set.count == 2)
@@ -127,7 +128,9 @@ struct `HTTP.Authentication Tests` {
 
     @Test
     func `Challenge parsing - multiple parameters`() async throws {
-        let challenge = HTTP.Authentication.Challenge.parse("Bearer realm=\"example\", scope=\"read write\"")
+        let challenge = HTTP.Authentication.Challenge.parse(
+            "Bearer realm=\"example\", scope=\"read write\""
+        )
 
         #expect(challenge?.scheme == .bearer)
         #expect(challenge?.parameters["realm"] == "example")

@@ -6,9 +6,9 @@
 //
 // HTTP authentication framework
 
-import Standards
-import RFC_4648
 import INCITS_4_1986
+import RFC_4648
+import Standards
 
 extension RFC_9110 {
     /// HTTP Authentication (RFC 9110 Section 11)
@@ -139,7 +139,8 @@ extension RFC_9110.Authentication {
             var result = scheme.name
 
             if !parameters.isEmpty {
-                let params = parameters
+                let params =
+                    parameters
                     .sorted { $0.key < $1.key }
                     .map { key, value in
                         // Quote value if it contains special characters
@@ -372,7 +373,10 @@ extension RFC_9110.Authentication.Credentials {
     /// )
     /// // Authorization: Basic dXNlcjpwYXNz
     /// ```
-    public static func basic(username: String, password: String) -> RFC_9110.Authentication.Credentials {
+    public static func basic(
+        username: String,
+        password: String
+    ) -> RFC_9110.Authentication.Credentials {
         let combined = "\(username):\(password)"
         let bytes = Array(combined.utf8)
         let encoded = String.base64(bytes)

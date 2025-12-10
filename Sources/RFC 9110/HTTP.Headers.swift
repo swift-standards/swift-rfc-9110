@@ -6,7 +6,6 @@
 //
 // A collection of HTTP header fields with convenient access
 
-
 // MARK: - Headers Collection
 
 extension RFC_9110 {
@@ -270,9 +269,9 @@ extension RFC_9110.Headers: CustomDebugStringConvertible {
             return "HTTP.Headers(0 fields)"
         } else {
             return """
-            HTTP.Headers(\(count) field\(count == 1 ? "" : "s")):
-            \(headerLines)
-            """
+                HTTP.Headers(\(count) field\(count == 1 ? "" : "s")):
+                \(headerLines)
+                """
         }
     }
 }

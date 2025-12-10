@@ -2,6 +2,7 @@
 // swift-rfc-9110
 
 import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -120,7 +121,7 @@ struct `HTTP.EntityTag Tests` {
 
         #expect(strong1 == strong2)
         #expect(weak1 == weak2)
-        #expect(strong1 != weak1) // Different isWeak
+        #expect(strong1 != weak1)  // Different isWeak
         #expect(strong1 != different)
     }
 
@@ -128,8 +129,8 @@ struct `HTTP.EntityTag Tests` {
     func `Hashable`() async throws {
         var set: Set<HTTP.EntityTag> = []
         set.insert(.strong("abc"))
-        set.insert(.strong("abc")) // Duplicate
-        set.insert(.weak("abc"))   // Different (isWeak differs)
+        set.insert(.strong("abc"))  // Duplicate
+        set.insert(.weak("abc"))  // Different (isWeak differs)
         set.insert(.strong("xyz"))
 
         #expect(set.count == 3)

@@ -138,6 +138,7 @@ extension RFC_9110 {
             let target: Target
 
             // Default path to "/" if not provided
+            // swiftlint:disable:next force_try
             let effectivePath = path ?? (try! RFC_3986.URI.Path("/"))
 
             if let scheme = scheme, let host = host {
@@ -186,7 +187,8 @@ extension RFC_9110 {
         ///
         /// - Parameter name: The header field name (case-insensitive)
         /// - Returns: The first value for that header field, or nil if not present
-        public func firstHeader(_ name: RFC_9110.Header.Field.Name) -> RFC_9110.Header.Field.Value? {
+        public func firstHeader(_ name: RFC_9110.Header.Field.Name) -> RFC_9110.Header.Field.Value?
+        {
             headers[name.rawValue]?.first
         }
 
@@ -291,7 +293,8 @@ extension RFC_9110 {
                     throw Error.invalidMethodForTarget(
                         method: method,
                         target: target,
-                        reason: "authority-form can only be used with CONNECT method (RFC 9110 §7.1)"
+                        reason:
+                            "authority-form can only be used with CONNECT method (RFC 9110 §7.1)"
                     )
                 }
 
@@ -311,7 +314,8 @@ extension RFC_9110 {
                     throw Error.invalidMethodForTarget(
                         method: method,
                         target: target,
-                        reason: "CONNECT method can only be used with authority-form (RFC 9110 §7.1)"
+                        reason:
+                            "CONNECT method can only be used with authority-form (RFC 9110 §7.1)"
                     )
                 }
             }

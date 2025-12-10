@@ -2,6 +2,7 @@
 // swift-rfc-9110
 
 import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -84,7 +85,7 @@ struct `HTTP.ContentEncoding Tests` {
     func `Format header - empty`() async throws {
         let header = HTTP.ContentEncoding.formatHeader([])
 
-        #expect(header == "")
+        #expect(header.isEmpty)
     }
 
     @Test
@@ -101,7 +102,7 @@ struct `HTTP.ContentEncoding Tests` {
     func `Hashable`() async throws {
         var set: Set<HTTP.ContentEncoding> = []
         set.insert(.gzip)
-        set.insert(.gzip) // Duplicate
+        set.insert(.gzip)  // Duplicate
         set.insert(.brotli)
 
         #expect(set.count == 2)

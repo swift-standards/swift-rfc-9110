@@ -1,8 +1,9 @@
 // HTTP.Request.Tests.swift
 // swift-rfc-9110
 
-import Testing
 import RFC_3986
+import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -107,7 +108,7 @@ struct `HTTP.Request Tests` {
             target: .origin(path: .init("/users"), query: nil),
             headers: [
                 .init(name: "Content-Type", value: "application/json"),
-                .init(name: "Content-Length", value: "\(jsonData.count)")
+                .init(name: "Content-Length", value: "\(jsonData.count)"),
             ],
             body: jsonData
         )
@@ -141,7 +142,7 @@ struct `HTTP.Request Tests` {
             target: .origin(path: .init("/"), query: nil),
             headers: [
                 .init(name: "Accept", value: "application/json"),
-                .init(name: "Accept", value: "text/html")
+                .init(name: "Accept", value: "text/html"),
             ]
         )
 
@@ -170,7 +171,7 @@ struct `HTTP.Request Tests` {
         )
 
         #expect(withHeader.headers.count == 1)
-        #expect(request.headers.count == 0) // Original unchanged
+        #expect(request.headers.isEmpty)  // Original unchanged
     }
 
     @Test
@@ -180,7 +181,7 @@ struct `HTTP.Request Tests` {
             target: .origin(path: .init("/"), query: nil),
             headers: [
                 .init(name: "Accept", value: "application/json"),
-                .init(name: "Authorization", value: "Bearer token")
+                .init(name: "Authorization", value: "Bearer token"),
             ]
         )
 
@@ -188,7 +189,7 @@ struct `HTTP.Request Tests` {
 
         #expect(withoutAuth.headers.count == 1)
         #expect(withoutAuth.headers.contains("Authorization") == false)
-        #expect(request.headers.count == 2) // Original unchanged
+        #expect(request.headers.count == 2)  // Original unchanged
     }
 
     @Test
@@ -204,7 +205,7 @@ struct `HTTP.Request Tests` {
             )
         )
 
-        try request.validate() // Should not throw
+        try request.validate()  // Should not throw
     }
 
     @Test
@@ -233,7 +234,7 @@ struct `HTTP.Request Tests` {
             target: .asterisk
         )
 
-        try request.validate() // Should not throw
+        try request.validate()  // Should not throw
     }
 
     @Test

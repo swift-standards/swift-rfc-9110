@@ -7,7 +7,6 @@
 // HTTP header fields are key-value pairs that convey information about the
 // message, its content, or the connection itself.
 
-
 extension RFC_9110 {
     /// HTTP Header namespace (RFC 9110 Section 6.3)
     ///
@@ -200,14 +199,16 @@ extension RFC_9110.Header.Field {
             if rawValue.unicodeScalars.contains(where: { $0 == "\r" }) {
                 throw Error.invalidFieldValue(
                     value: rawValue,
-                    reason: "Header field value contains CR (carriage return) character, forbidden by RFC 9110 §5.5"
+                    reason:
+                        "Header field value contains CR (carriage return) character, forbidden by RFC 9110 §5.5"
                 )
             }
 
             if rawValue.unicodeScalars.contains(where: { $0 == "\n" }) {
                 throw Error.invalidFieldValue(
                     value: rawValue,
-                    reason: "Header field value contains LF (line feed) character, forbidden by RFC 9110 §5.5"
+                    reason:
+                        "Header field value contains LF (line feed) character, forbidden by RFC 9110 §5.5"
                 )
             }
 
@@ -235,7 +236,6 @@ extension RFC_9110.Header.Field {
         case invalidFieldValue(value: String, reason: String)
     }
 }
-
 
 // MARK: - Name String Conversion
 

@@ -2,6 +2,7 @@
 // swift-rfc-9110
 
 import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -49,7 +50,7 @@ struct `HTTP.Status Tests` {
         var set: Set<HTTP.Status> = []
         set.insert(.ok)
         set.insert(.created)
-        set.insert(.ok) // duplicate
+        set.insert(.ok)  // duplicate
 
         #expect(set.count == 2)
         #expect(set.contains(.ok))

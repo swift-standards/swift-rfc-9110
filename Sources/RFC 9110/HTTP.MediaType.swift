@@ -7,8 +7,8 @@
 //
 // Media types for HTTP content negotiation
 
-import Standards
 import INCITS_4_1986
+import Standards
 
 extension RFC_9110 {
     /// HTTP Media Type (RFC 9110 Section 8.3)
@@ -74,7 +74,8 @@ extension RFC_9110 {
             var result = "\(type)/\(subtype)"
 
             if !parameters.isEmpty {
-                let params = parameters
+                let params =
+                    parameters
                     .sorted { $0.key < $1.key }
                     .map { "\($0.key)=\($0.value)" }
                     .joined(separator: "; ")
@@ -108,8 +109,9 @@ extension RFC_9110 {
             let typeComponents = firstComponent.trimming(.ascii.whitespaces)
                 .split(separator: "/")
             guard typeComponents.count == 2,
-                  !typeComponents[0].isEmpty,
-                  !typeComponents[1].isEmpty else {
+                !typeComponents[0].isEmpty,
+                !typeComponents[1].isEmpty
+            else {
                 return nil
             }
 

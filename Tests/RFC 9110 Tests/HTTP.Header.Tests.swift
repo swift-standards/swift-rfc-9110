@@ -2,6 +2,7 @@
 // swift-rfc-9110
 
 import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -22,7 +23,7 @@ struct `HTTP.Header.Field Tests` {
     func `Field name hashable with case insensitivity`() async throws {
         var set: Set<HTTP.Header.Field.Name> = []
         set.insert("Content-Type")
-        set.insert("content-type") // Same as above
+        set.insert("content-type")  // Same as above
         set.insert("Accept")
 
         #expect(set.count == 2)
@@ -138,7 +139,7 @@ struct `HTTP.Headers Tests` {
     func `Headers initialization`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json"),
-            .init(name: "Accept", value: "application/json")
+            .init(name: "Accept", value: "application/json"),
         ])
 
         #expect(headers.count == 2)
@@ -161,7 +162,7 @@ struct `HTTP.Headers Tests` {
     func `Headers with multiple values`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Accept", value: "application/json"),
-            .init(name: "Accept", value: "text/html")
+            .init(name: "Accept", value: "text/html"),
         ])
 
         let acceptValues = headers["Accept"]
@@ -181,7 +182,7 @@ struct `HTTP.Headers Tests` {
 
         // Append to existing header
         headers.append(try .init(name: "Accept", value: "text/html"))
-        #expect(headers.count == 2) // Still 2 unique names
+        #expect(headers.count == 2)  // Still 2 unique names
         #expect(headers["Accept"]?.count == 2)
     }
 
@@ -189,7 +190,7 @@ struct `HTTP.Headers Tests` {
     func `Headers removeAll`() async throws {
         var headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json"),
-            .init(name: "Accept", value: "application/json")
+            .init(name: "Accept", value: "application/json"),
         ])
 
         headers.removeAll(named: "Content-Type")
@@ -203,7 +204,7 @@ struct `HTTP.Headers Tests` {
         let headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json"),
             .init(name: "Accept", value: "text/html"),
-            .init(name: "Accept", value: "application/json")
+            .init(name: "Accept", value: "application/json"),
         ])
 
         let fields = Array(headers)
@@ -221,7 +222,7 @@ struct `HTTP.Headers Tests` {
         ])
 
         #expect(headers.contains("Content-Type"))
-        #expect(headers.contains("content-type")) // Case insensitive
+        #expect(headers.contains("content-type"))  // Case insensitive
         #expect(!headers.contains("Accept"))
     }
 
@@ -229,7 +230,7 @@ struct `HTTP.Headers Tests` {
     func `Headers first`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Accept", value: "application/json"),
-            .init(name: "Accept", value: "text/html")
+            .init(name: "Accept", value: "text/html"),
         ])
 
         #expect(headers.first("Accept")?.rawValue == "application/json")
@@ -240,7 +241,7 @@ struct `HTTP.Headers Tests` {
     func `Headers values`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Accept", value: "application/json"),
-            .init(name: "Accept", value: "text/html")
+            .init(name: "Accept", value: "text/html"),
         ])
 
         let values = headers.values("Accept")
@@ -254,7 +255,7 @@ struct `HTTP.Headers Tests` {
     func `Headers codable`() async throws {
         let headers = try HTTP.Headers([
             .init(name: "Content-Type", value: "application/json"),
-            .init(name: "Accept", value: "text/html")
+            .init(name: "Accept", value: "text/html"),
         ])
 
         let encoder = JSONEncoder()

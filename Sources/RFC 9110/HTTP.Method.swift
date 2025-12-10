@@ -7,7 +7,6 @@
 // The method token indicates the request method to be performed on the
 // target resource. The request method is case-sensitive.
 
-
 extension RFC_9110 {
     /// HTTP Method (RFC 9110 Section 9)
     ///
@@ -108,10 +107,8 @@ extension RFC_9110 {
         // MARK: - Equatable
 
         public static func == (lhs: Method, rhs: Method) -> Bool {
-            lhs.rawValue == rhs.rawValue &&
-            lhs.isSafe == rhs.isSafe &&
-            lhs.isIdempotent == rhs.isIdempotent &&
-            lhs.isCacheable == rhs.isCacheable
+            lhs.rawValue == rhs.rawValue && lhs.isSafe == rhs.isSafe
+                && lhs.isIdempotent == rhs.isIdempotent && lhs.isCacheable == rhs.isCacheable
         }
 
         // MARK: - Hashable
@@ -132,7 +129,7 @@ extension RFC_9110 {
             // Try to find a standard method first
             let standardMethods: [Method] = [
                 .get, .head, .post, .put, .delete,
-                .connect, .options, .trace, .patch
+                .connect, .options, .trace, .patch,
             ]
 
             if let standard = standardMethods.first(where: { $0.rawValue == rawValue }) {
@@ -181,12 +178,22 @@ extension RFC_9110.Method {
     /// CONNECT: Establish tunnel to server identified by target resource (Section 9.3.6)
     ///
     /// Not safe, not idempotent, not cacheable
-    public static let connect = Self("CONNECT", isSafe: false, isIdempotent: false, isCacheable: false)
+    public static let connect = Self(
+        "CONNECT",
+        isSafe: false,
+        isIdempotent: false,
+        isCacheable: false
+    )
 
     /// OPTIONS: Describe communication options for target resource (Section 9.3.7)
     ///
     /// Safe, idempotent, not cacheable
-    public static let options = Self("OPTIONS", isSafe: true, isIdempotent: true, isCacheable: false)
+    public static let options = Self(
+        "OPTIONS",
+        isSafe: true,
+        isIdempotent: true,
+        isCacheable: false
+    )
 
     /// TRACE: Perform message loop-back test along path to target resource (Section 9.3.8)
     ///

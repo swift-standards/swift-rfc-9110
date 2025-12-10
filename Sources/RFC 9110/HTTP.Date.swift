@@ -123,4 +123,3 @@ extension RFC_9110.Header.Field {
         )
     }
 }
-

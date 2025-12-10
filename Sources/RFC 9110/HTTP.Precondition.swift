@@ -1,9 +1,9 @@
 // HTTP.Precondition.swift
 // swift-rfc-9110
 
+import INCITS_4_1986
 public import RFC_5322
 import Standards
-import INCITS_4_1986
 
 extension HTTP {
     /// Conditional request preconditions (RFC 9110 Section 13)
@@ -139,7 +139,8 @@ extension HTTP.Precondition {
         }
 
         // Parse comma-separated ETags
-        let etags = trimmed
+        let etags =
+            trimmed
             .split(separator: ",")
             .compactMap { HTTP.EntityTag.parse(String($0.trimming(.ascii.whitespaces))) }
 
@@ -159,7 +160,8 @@ extension HTTP.Precondition {
         }
 
         // Parse comma-separated ETags
-        let etags = trimmed
+        let etags =
+            trimmed
             .split(separator: ",")
             .compactMap { HTTP.EntityTag.parse(String($0.trimming(.ascii.whitespaces))) }
 

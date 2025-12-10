@@ -2,6 +2,7 @@
 // swift-rfc-9110
 
 import Testing
+
 @testable import RFC_9110
 
 @Suite
@@ -25,7 +26,7 @@ struct `HTTP.Response Tests` {
             status: .ok,
             headers: [
                 .init(name: "Content-Type", value: "application/json"),
-                .init(name: "Content-Length", value: "\(jsonData.count)")
+                .init(name: "Content-Length", value: "\(jsonData.count)"),
             ],
             body: jsonData
         )
@@ -41,7 +42,7 @@ struct `HTTP.Response Tests` {
             status: .ok,
             headers: [
                 .init(name: "Set-Cookie", value: "session=abc123"),
-                .init(name: "Set-Cookie", value: "user=john")
+                .init(name: "Set-Cookie", value: "user=john"),
             ]
         )
 
@@ -63,7 +64,7 @@ struct `HTTP.Response Tests` {
         )
 
         #expect(withHeader.headers.count == 1)
-        #expect(response.headers.count == 0) // Original unchanged
+        #expect(response.headers.isEmpty)  // Original unchanged
     }
 
     @Test
@@ -72,7 +73,7 @@ struct `HTTP.Response Tests` {
             status: .ok,
             headers: [
                 .init(name: "Content-Type", value: "application/json"),
-                .init(name: "X-Custom", value: "value")
+                .init(name: "X-Custom", value: "value"),
             ]
         )
 
@@ -80,7 +81,7 @@ struct `HTTP.Response Tests` {
 
         #expect(withoutCustom.headers.count == 1)
         #expect(withoutCustom.headers.contains("X-Custom") == false)
-        #expect(response.headers.count == 2) // Original unchanged
+        #expect(response.headers.count == 2)  // Original unchanged
     }
 
     @Test
