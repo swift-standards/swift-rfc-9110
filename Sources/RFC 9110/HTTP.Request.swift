@@ -187,8 +187,7 @@ extension RFC_9110 {
         ///
         /// - Parameter name: The header field name (case-insensitive)
         /// - Returns: The first value for that header field, or nil if not present
-        public func firstHeader(_ name: RFC_9110.Header.Field.Name) -> RFC_9110.Header.Field.Value?
-        {
+        public func firstHeader(_ name: RFC_9110.Header.Field.Name) -> RFC_9110.Header.Field.Value? {
             headers[name.rawValue]?.first
         }
 
