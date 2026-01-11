@@ -8,7 +8,7 @@
 
 import INCITS_4_1986
 import RFC_4648
-import Standards
+import Standard_Library_Extensions
 
 extension RFC_9110 {
     /// HTTP Authentication (RFC 9110 Section 11)

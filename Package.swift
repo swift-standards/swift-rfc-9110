@@ -18,11 +18,11 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
-        .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.3"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-3986", from: "0.3.3"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-4648", from: "0.5.3"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-5322", from: "0.7.1"),
-        .package(url: "https://github.com/swift-standards/swift-standards", from: "0.10.0")
+        .package(path: "../swift-incits-4-1986"),
+        .package(path: "../swift-rfc-3986"),
+        .package(path: "../swift-rfc-4648"),
+        .package(path: "../swift-rfc-5322"),
+        .package(path: "../../swift-primitives/swift-standard-library-extensions")
     ],
     targets: [
         .target(
@@ -33,7 +33,7 @@ let package = Package(
                 .product(name: "RFC 3986", package: "swift-rfc-3986"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
                 .product(name: "RFC 5322", package: "swift-rfc-5322"),
-                .product(name: "Standards", package: "swift-standards")
+                .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions")
             ]
         ),
         .testTarget(

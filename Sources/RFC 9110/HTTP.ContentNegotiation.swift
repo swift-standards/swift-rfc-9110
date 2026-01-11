@@ -7,7 +7,7 @@
 // Proactive content negotiation mechanisms
 
 import INCITS_4_1986
-import Standards
+import Standard_Library_Extensions
 
 extension RFC_9110 {
     /// HTTP Content Negotiation (RFC 9110 Section 12)

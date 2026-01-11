@@ -2,7 +2,7 @@
 // swift-rfc-9110
 
 import INCITS_4_1986
-import Standards
+import Standard_Library_Extensions
 
 extension HTTP {
     /// Content-Language header field (RFC 9110 Section 8.5)

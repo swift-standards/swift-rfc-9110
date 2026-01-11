@@ -3,7 +3,7 @@
 
 import INCITS_4_1986
 public import RFC_5322
-import Standards
+import Standard_Library_Extensions
 
 extension HTTP {
     /// Conditional request preconditions (RFC 9110 Section 13)

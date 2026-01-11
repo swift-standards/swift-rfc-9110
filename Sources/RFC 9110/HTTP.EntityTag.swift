@@ -7,7 +7,7 @@
 // Entity tags (ETags) are used for cache validation and conditional requests
 
 import INCITS_4_1986
-import Standards
+import Standard_Library_Extensions
 
 extension RFC_9110 {
     /// HTTP Entity Tag (ETag) per RFC 9110 Section 8.8.3

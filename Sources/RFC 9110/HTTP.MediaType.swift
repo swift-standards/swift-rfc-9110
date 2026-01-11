@@ -8,7 +8,7 @@
 // Media types for HTTP content negotiation
 
 import INCITS_4_1986
-import Standards
+import Standard_Library_Extensions
 
 extension RFC_9110 {
     /// HTTP Media Type (RFC 9110 Section 8.3)

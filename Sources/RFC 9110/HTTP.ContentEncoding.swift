@@ -7,7 +7,7 @@
 // Content coding values indicate an encoding transformation applied to the representation
 
 import INCITS_4_1986
-import Standards
+import Standard_Library_Extensions
 
 extension RFC_9110 {
     /// HTTP Content Encoding (RFC 9110 Section 8.4)
