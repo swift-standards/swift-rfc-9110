@@ -1,7 +1,7 @@
 // HTTP.ContentLanguage.swift
 // swift-rfc-9110
 
-import INCITS_4_1986
+import ASCII
 import Standard_Library_Extensions
 
 extension HTTP {

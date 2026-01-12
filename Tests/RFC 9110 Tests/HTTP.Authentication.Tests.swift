@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.Authentication.Tests.swift
 // swift-rfc-9110
 

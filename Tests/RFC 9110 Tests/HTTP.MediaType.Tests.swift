@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.MediaType.Tests.swift
 // swift-rfc-9110
 

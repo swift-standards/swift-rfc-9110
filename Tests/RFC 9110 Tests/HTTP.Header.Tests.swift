@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.Header.Tests.swift
 // swift-rfc-9110
 
@@ -43,7 +44,7 @@ struct `HTTP.Header.Field Tests` {
         do {
             _ = try HTTP.Header.Field.Value("value\rtest")
             Issue.record("Should have thrown for CR character")
-        } catch let error as HTTP.Header.Field.ValidationError {
+        } catch let error as HTTP.Header.Field.Error {
             if case .invalidFieldValue(let value, let reason) = error {
                 #expect(value == "value\rtest")
                 #expect(reason.contains("CR"))
@@ -58,7 +59,7 @@ struct `HTTP.Header.Field Tests` {
         do {
             _ = try HTTP.Header.Field.Value("value\ntest")
             Issue.record("Should have thrown for LF character")
-        } catch let error as HTTP.Header.Field.ValidationError {
+        } catch let error as HTTP.Header.Field.Error {
             if case .invalidFieldValue(let value, let reason) = error {
                 #expect(value == "value\ntest")
                 #expect(reason.contains("LF"))

@@ -6,7 +6,7 @@
 //
 // HTTP authentication framework
 
-import INCITS_4_1986
+import ASCII
 import RFC_4648
 import Standard_Library_Extensions
 

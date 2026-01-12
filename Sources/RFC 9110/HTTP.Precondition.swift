@@ -1,7 +1,7 @@
 // HTTP.Precondition.swift
 // swift-rfc-9110
 
-import INCITS_4_1986
+import ASCII
 public import RFC_5322
 import Standard_Library_Extensions
 

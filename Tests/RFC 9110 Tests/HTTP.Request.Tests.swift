@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.Request.Tests.swift
 // swift-rfc-9110
 
@@ -218,7 +219,7 @@ struct `HTTP.Request Tests` {
         do {
             try request.validate()
             Issue.record("Should have thrown validation error")
-        } catch let error as HTTP.Request.ValidationError {
+        } catch let error as HTTP.Request.Error {
             if case .invalidMethodForTarget = error {
                 // Expected
             } else {
@@ -247,7 +248,7 @@ struct `HTTP.Request Tests` {
         do {
             try request.validate()
             Issue.record("Should have thrown validation error")
-        } catch let error as HTTP.Request.ValidationError {
+        } catch let error as HTTP.Request.Error {
             if case .invalidMethodForTarget = error {
                 // Expected
             } else {

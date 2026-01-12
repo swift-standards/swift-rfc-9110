@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.Method.Tests.swift
 // swift-rfc-9110
 

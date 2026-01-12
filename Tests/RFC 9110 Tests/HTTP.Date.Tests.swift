@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.Date.Tests.swift
 // swift-rfc-9110
 

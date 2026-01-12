@@ -7,7 +7,7 @@
 //
 // Media types for HTTP content negotiation
 
-import INCITS_4_1986
+import ASCII
 import Standard_Library_Extensions
 
 extension RFC_9110 {

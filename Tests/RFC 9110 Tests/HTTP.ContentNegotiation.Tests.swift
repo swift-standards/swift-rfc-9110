@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.ContentNegotiation.Tests.swift
 // swift-rfc-9110
 

@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.ContentEncoding.Tests.swift
 // swift-rfc-9110
 

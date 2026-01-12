@@ -6,7 +6,7 @@
 //
 // Proactive content negotiation mechanisms
 
-import INCITS_4_1986
+import ASCII
 import Standard_Library_Extensions
 
 extension RFC_9110 {

@@ -1,3 +1,4 @@
+import Foundation
 // HTTP.EntityTag.Tests.swift
 // swift-rfc-9110
 

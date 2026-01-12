@@ -6,7 +6,7 @@
 //
 // Content coding values indicate an encoding transformation applied to the representation
 
-import INCITS_4_1986
+import ASCII
 import Standard_Library_Extensions
 
 extension RFC_9110 {
