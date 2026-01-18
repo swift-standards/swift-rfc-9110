@@ -34,11 +34,7 @@ let package = Package(
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
                 .product(name: "RFC 5322", package: "swift-rfc-5322"),
                 .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions")
-            ]
-        ),
-        .testTarget(
-            name: "RFC 9110".tests,
-            dependencies: ["RFC 9110"]
+    ]
         )
     ],
     swiftLanguageModes: [.v6]
