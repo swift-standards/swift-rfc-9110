@@ -17,7 +17,6 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "../../swift-primitives/swift-container-primitives"),
         .package(path: "../../swift-foundations/swift-ascii"),
         .package(path: "../swift-rfc-3986"),
         .package(path: "../swift-rfc-4648"),
@@ -28,7 +27,6 @@ let package = Package(
         .target(
             name: "RFC 9110",
             dependencies: [
-                .product(name: "Container Primitives", package: "swift-container-primitives"),
                 .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "RFC 3986", package: "swift-rfc-3986"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),

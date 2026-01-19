@@ -16,7 +16,6 @@
 // - HTTP.MediaType - Media type handling
 // - HTTP.ContentNegotiation - Content negotiation
 
-import Container_Primitives
 import RFC_3986
 
 /// HTTP Semantics namespace (RFC 9110)
