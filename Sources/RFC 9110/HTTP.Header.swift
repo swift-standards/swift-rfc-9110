@@ -69,7 +69,7 @@ extension RFC_9110.Header {
         ///   - name: The header field name
         ///   - value: The header field value (will be validated)
         /// - Throws: `ValidationError` if the value contains invalid characters
-        public init(name: String, value: String) throws {
+        public init(name: String, value: String) throws(Error) {
             self.name = Name(name)
             self.value = try Value(value)
         }
@@ -193,7 +193,7 @@ extension RFC_9110.Header.Field {
         /// ```swift
         /// let valid = try HTTP.Header.Field.Value("text/html; charset=utf-8")
         /// ```
-        public init(_ rawValue: String) throws {
+        public init(_ rawValue: String) throws(Error) {
             // RFC 9110 Section 5.5: field-content cannot contain CR or LF
             // Check for CR (U+000D) and LF (U+000A) characters
             if rawValue.unicodeScalars.contains(where: { $0 == "\r" }) {
