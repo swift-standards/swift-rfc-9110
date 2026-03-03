@@ -18,6 +18,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../../swift-foundations/swift-ascii"),
+        .package(path: "../../swift-primitives/swift-parser-primitives"),
         .package(path: "../swift-rfc-3986"),
         .package(path: "../swift-rfc-4648"),
         .package(path: "../swift-rfc-5322"),
@@ -28,6 +29,8 @@ let package = Package(
             name: "RFC 9110",
             dependencies: [
                 .product(name: "ASCII", package: "swift-ascii"),
+                .product(name: "Parser Primitives", package: "swift-parser-primitives"),
+                .product(name: "Parser ASCII Integer Primitives", package: "swift-parser-primitives"),
                 .product(name: "RFC 3986", package: "swift-rfc-3986"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
                 .product(name: "RFC 5322", package: "swift-rfc-5322"),
