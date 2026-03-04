@@ -152,28 +152,65 @@ extension RFC_9110.ContentNegotiation {
         /// // Returns 3 preferences sorted by quality
         /// ```
         public static func parse(_ headerValue: String) -> [MediaTypePreference] {
-            let components = headerValue.split(separator: ",")
+            let bytes = Array(headerValue.utf8)
+            let items = HTTP.Parse._splitOnComma(bytes)
             var preferences: [MediaTypePreference] = []
 
-            for component in components {
-                let trimmed = component.trimming(.ascii.whitespaces)
+            for range in items {
+                let trimmed = HTTP.Parse._trimOWS(bytes, range)
+                guard !trimmed.isEmpty else { continue }
 
-                // Split on semicolon to separate media type from parameters
-                let parts = trimmed.split(separator: ";")
-                guard let typeSubtype = parts.first,
-                    let mediaType = RFC_9110.MediaType.parse(String(typeSubtype))
-                else {
-                    continue
-                }
+                // Parse: type/subtype *( ";" param=value ) [ ";" q=N.NNN ]
+                var i = trimmed.lowerBound
 
-                // Look for q parameter
+                // type
+                let typeStart = i
+                while i < trimmed.upperBound && HTTP.Parse._isTchar(bytes[i]) { i &+= 1 }
+                guard i > typeStart else { continue }
+                let type = String(decoding: bytes[typeStart..<i], as: UTF8.self)
+
+                // "/"
+                guard i < trimmed.upperBound, bytes[i] == 0x2F else { continue }
+                i &+= 1
+
+                // subtype
+                let subStart = i
+                while i < trimmed.upperBound && HTTP.Parse._isTchar(bytes[i]) { i &+= 1 }
+                guard i > subStart else { continue }
+                let subtype = String(decoding: bytes[subStart..<i], as: UTF8.self)
+
+                let mediaType = RFC_9110.MediaType(type, subtype)
+
+                // Scan for quality among semicolon-delimited parameters
                 var quality = QualityValue.default
-                for part in parts.dropFirst() {
-                    let param = part.trimming(.ascii.whitespaces)
-                    if param.hasPrefix("q=") {
-                        let qValue = String(param.dropFirst(2))
-                        if let parsed = QualityValue.parse(qValue) {
-                            quality = parsed
+                while i < trimmed.upperBound {
+                    HTTP.Parse._skipOWS(bytes, &i)
+                    guard i < trimmed.upperBound, bytes[i] == 0x3B else { break }
+                    i &+= 1
+                    HTTP.Parse._skipOWS(bytes, &i)
+
+                    // Check for q= (quality)
+                    if i < trimmed.upperBound && (bytes[i] == 0x71 || bytes[i] == 0x51),
+                        i &+ 1 < trimmed.upperBound && bytes[i &+ 1] == 0x3D
+                    {
+                        i &+= 2
+                        let numStart = i
+                        while i < trimmed.upperBound
+                            && ((bytes[i] >= 0x30 && bytes[i] <= 0x39) || bytes[i] == 0x2E)
+                        {
+                            i &+= 1
+                        }
+                        if i > numStart,
+                            let q = Double(String(decoding: bytes[numStart..<i], as: UTF8.self))
+                        {
+                            quality = QualityValue(q)
+                        }
+                    } else {
+                        // Skip non-quality parameter (token=token/quoted-string)
+                        while i < trimmed.upperBound && HTTP.Parse._isTchar(bytes[i]) { i &+= 1 }
+                        if i < trimmed.upperBound && bytes[i] == 0x3D {
+                            i &+= 1
+                            let _ = HTTP.Parse._tokenOrQuotedString(bytes, &i)
                         }
                     }
                 }
@@ -187,7 +224,6 @@ extension RFC_9110.ContentNegotiation {
                     return lhs.quality > rhs.quality
                 }
 
-                // More specific types come first
                 if lhs.mediaType.type == "*" && rhs.mediaType.type != "*" {
                     return false
                 }
@@ -364,38 +400,26 @@ extension RFC_9110.ContentNegotiation {
         /// )
         /// ```
         public static func parse(_ headerValue: String) -> [EncodingPreference] {
-            let components = headerValue.split(separator: ",")
+            let bytes = Array(headerValue.utf8)
+            let items = HTTP.Parse._splitOnComma(bytes)
             var preferences: [EncodingPreference] = []
 
-            for component in components {
-                let trimmed = component.trimming(.ascii.whitespaces)
+            for range in items {
+                let trimmed = HTTP.Parse._trimOWS(bytes, range)
+                guard !trimmed.isEmpty else { continue }
 
-                // Split on semicolon to separate encoding from quality
-                let parts = trimmed.split(separator: ";")
-                guard let encodingString = parts.first?.trimming(.ascii.whitespaces),
-                    !encodingString.isEmpty
-                else {
-                    continue
-                }
+                var i = trimmed.lowerBound
+                guard let token = HTTP.Parse._token(bytes, &i) else { continue }
+                let encoding = RFC_9110.ContentEncoding(token)
 
-                let encoding = RFC_9110.ContentEncoding(encodingString)
-
-                // Look for q parameter
                 var quality = QualityValue.default
-                for part in parts.dropFirst() {
-                    let param = part.trimming(.ascii.whitespaces)
-                    if param.hasPrefix("q=") {
-                        let qValue = String(param.dropFirst(2))
-                        if let parsed = QualityValue.parse(qValue) {
-                            quality = parsed
-                        }
-                    }
+                if let q = HTTP.Parse._quality(bytes, &i) {
+                    quality = QualityValue(q)
                 }
 
                 preferences.append(EncodingPreference(encoding: encoding, quality: quality))
             }
 
-            // Sort by quality (descending)
             return preferences.sorted { $0.quality > $1.quality }
         }
     }
@@ -457,41 +481,36 @@ extension RFC_9110.ContentNegotiation {
         /// )
         /// ```
         public static func parse(_ headerValue: String) -> [LanguagePreference] {
-            let components = headerValue.split(separator: ",")
+            let bytes = Array(headerValue.utf8)
+            let items = HTTP.Parse._splitOnComma(bytes)
             var preferences: [LanguagePreference] = []
 
-            for component in components {
-                let trimmed = component.trimming(.ascii.whitespaces)
+            for range in items {
+                let trimmed = HTTP.Parse._trimOWS(bytes, range)
+                guard !trimmed.isEmpty else { continue }
 
-                // Split on semicolon to separate language from quality
-                let parts = trimmed.split(separator: ";")
-                guard let language = parts.first?.trimming(.ascii.whitespaces),
-                    !language.isEmpty
-                else {
-                    continue
+                // Language tags contain letters and hyphens (not just tchar), scan to semicolon
+                var i = trimmed.lowerBound
+                while i < trimmed.upperBound && bytes[i] != 0x3B && bytes[i] != 0x20
+                    && bytes[i] != 0x09
+                {
+                    i &+= 1
                 }
+                guard i > trimmed.lowerBound else { continue }
+                let language = String(decoding: bytes[trimmed.lowerBound..<i], as: UTF8.self)
 
-                // Look for q parameter
                 var quality = QualityValue.default
-                for part in parts.dropFirst() {
-                    let param = part.trimming(.ascii.whitespaces)
-                    if param.hasPrefix("q=") {
-                        let qValue = String(param.dropFirst(2))
-                        if let parsed = QualityValue.parse(qValue) {
-                            quality = parsed
-                        }
-                    }
+                if let q = HTTP.Parse._quality(bytes, &i) {
+                    quality = QualityValue(q)
                 }
 
                 preferences.append(LanguagePreference(language: language, quality: quality))
             }
 
-            // Sort by quality (descending), then by specificity
             return preferences.sorted { lhs, rhs in
                 if lhs.quality.value != rhs.quality.value {
                     return lhs.quality > rhs.quality
                 }
-                // More specific language tags come first (en-US before en)
                 return lhs.language.count > rhs.language.count
             }
         }
@@ -559,36 +578,25 @@ extension RFC_9110.ContentNegotiation {
         /// )
         /// ```
         public static func parse(_ headerValue: String) -> [CharsetPreference] {
-            let components = headerValue.split(separator: ",")
+            let bytes = Array(headerValue.utf8)
+            let items = HTTP.Parse._splitOnComma(bytes)
             var preferences: [CharsetPreference] = []
 
-            for component in components {
-                let trimmed = component.trimming(.ascii.whitespaces)
+            for range in items {
+                let trimmed = HTTP.Parse._trimOWS(bytes, range)
+                guard !trimmed.isEmpty else { continue }
 
-                // Split on semicolon to separate charset from quality
-                let parts = trimmed.split(separator: ";")
-                guard let charset = parts.first?.trimming(.ascii.whitespaces),
-                    !charset.isEmpty
-                else {
-                    continue
-                }
+                var i = trimmed.lowerBound
+                guard let token = HTTP.Parse._token(bytes, &i) else { continue }
 
-                // Look for q parameter
                 var quality = QualityValue.default
-                for part in parts.dropFirst() {
-                    let param = part.trimming(.ascii.whitespaces)
-                    if param.hasPrefix("q=") {
-                        let qValue = String(param.dropFirst(2))
-                        if let parsed = QualityValue.parse(qValue) {
-                            quality = parsed
-                        }
-                    }
+                if let q = HTTP.Parse._quality(bytes, &i) {
+                    quality = QualityValue(q)
                 }
 
-                preferences.append(CharsetPreference(charset: charset, quality: quality))
+                preferences.append(CharsetPreference(charset: token, quality: quality))
             }
 
-            // Sort by quality (descending)
             return preferences.sorted { $0.quality > $1.quality }
         }
     }

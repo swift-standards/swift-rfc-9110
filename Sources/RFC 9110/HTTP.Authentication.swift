@@ -162,36 +162,44 @@ extension RFC_9110.Authentication {
         /// - Parameter headerValue: The WWW-Authenticate header value
         /// - Returns: A Challenge if parsing succeeds, nil otherwise
         public static func parse(_ headerValue: String) -> Challenge? {
-            let trimmed = headerValue.trimming(.ascii.whitespaces)
+            let bytes = Array(headerValue.utf8)
+            var i = 0
 
-            // Extract scheme (first token)
-            guard let spaceIndex = trimmed.firstIndex(of: " ") else {
-                // Just a scheme, no parameters
-                return Challenge(scheme: Scheme(trimmed))
-            }
+            // Skip leading OWS
+            HTTP.Parse._skipOWS(bytes, &i)
 
-            let schemeName = String(trimmed[..<spaceIndex])
+            // Parse scheme (token)
+            guard let schemeName = HTTP.Parse._token(bytes, &i) else { return nil }
             let scheme = Scheme(schemeName)
 
-            // Parse parameters
-            let paramsString = String(trimmed[trimmed.index(after: spaceIndex)...])
+            // If no more content, scheme-only challenge
+            HTTP.Parse._skipOWS(bytes, &i)
+            guard i < bytes.count else {
+                return Challenge(scheme: scheme)
+            }
+
+            // Parse comma-separated parameters: token "=" (token / quoted-string)
             var parameters: [String: String] = [:]
+            let paramBytes = Array(bytes[i...])
+            let items = HTTP.Parse._splitOnComma(paramBytes)
 
-            // Simple parameter parsing (doesn't handle all edge cases)
-            let paramComponents = paramsString.split(separator: ",")
-            for component in paramComponents {
-                let trimmedComponent = component.trimming(.ascii.whitespaces)
-                let parts = trimmedComponent.split(separator: "=")
+            for range in items {
+                let trimmed = HTTP.Parse._trimOWS(paramBytes, range)
+                guard !trimmed.isEmpty else { continue }
 
-                guard parts.count == 2 else { continue }
+                var j = trimmed.lowerBound
 
-                let key = parts[0].trimming(.ascii.whitespaces)
-                var value = parts[1].trimming(.ascii.whitespaces)
+                // key (token)
+                guard let key = HTTP.Parse._token(paramBytes, &j) else { continue }
+                HTTP.Parse._skipOWS(paramBytes, &j)
 
-                // Remove quotes if present
-                if value.hasPrefix("\"") && value.hasSuffix("\"") {
-                    value = String(value.dropFirst().dropLast())
-                }
+                // "="
+                guard j < trimmed.upperBound, paramBytes[j] == 0x3D else { continue }
+                j &+= 1
+                HTTP.Parse._skipOWS(paramBytes, &j)
+
+                // value (token / quoted-string)
+                guard let value = HTTP.Parse._tokenOrQuotedString(paramBytes, &j) else { continue }
 
                 parameters[key] = value
             }

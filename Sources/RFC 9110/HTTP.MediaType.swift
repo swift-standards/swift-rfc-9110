@@ -99,42 +99,41 @@ extension RFC_9110 {
         /// // mt?.parameters["charset"] == "utf-8"
         /// ```
         public static func parse(_ string: String) -> MediaType? {
-            let trimmed = string.trimming(.ascii.whitespaces)
+            let bytes = Array(string.utf8)
+            var i = 0
 
-            // Split on first semicolon to separate type/subtype from parameters
-            let components = trimmed.split(separator: ";")
-            guard let firstComponent = components.first else { return nil }
+            // Skip leading OWS
+            HTTP.Parse._skipOWS(bytes, &i)
 
-            // Parse type/subtype
-            let typeComponents = firstComponent.trimming(.ascii.whitespaces)
-                .split(separator: "/")
-            guard typeComponents.count == 2,
-                !typeComponents[0].isEmpty,
-                !typeComponents[1].isEmpty
-            else {
-                return nil
-            }
+            // Parse type (token)
+            guard let type = HTTP.Parse._token(bytes, &i) else { return nil }
 
-            let type = typeComponents[0].trimming(.ascii.whitespaces)
-            let subtype = typeComponents[1].trimming(.ascii.whitespaces)
+            // Expect "/"
+            guard i < bytes.count, bytes[i] == 0x2F else { return nil }
+            i &+= 1
 
-            // Parse parameters
+            // Parse subtype (token)
+            guard let subtype = HTTP.Parse._token(bytes, &i) else { return nil }
+
+            // Parse parameters: *( OWS ";" OWS parameter )
             var parameters: [String: String] = [:]
-            if components.count > 1 {
-                for param in components.dropFirst() {
-                    let paramParts = param.split(separator: "=")
-                    guard paramParts.count == 2 else { continue }
+            while i < bytes.count {
+                HTTP.Parse._skipOWS(bytes, &i)
+                guard i < bytes.count, bytes[i] == 0x3B else { break }
+                i &+= 1
+                HTTP.Parse._skipOWS(bytes, &i)
 
-                    let key = paramParts[0].trimming(.ascii.whitespaces).lowercased()
-                    var value = paramParts[1].trimming(.ascii.whitespaces)
+                // parameter-name (token)
+                guard let name = HTTP.Parse._token(bytes, &i) else { break }
 
-                    // Remove quotes if present
-                    if value.hasPrefix("\"") && value.hasSuffix("\"") {
-                        value = String(value.dropFirst().dropLast())
-                    }
+                // "="
+                guard i < bytes.count, bytes[i] == 0x3D else { break }
+                i &+= 1
 
-                    parameters[key] = value
-                }
+                // parameter-value (token / quoted-string)
+                guard let value = HTTP.Parse._tokenOrQuotedString(bytes, &i) else { break }
+
+                parameters[name.lowercased()] = value
             }
 
             return MediaType(type, subtype, parameters: parameters)

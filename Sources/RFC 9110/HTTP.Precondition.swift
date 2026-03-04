@@ -131,18 +131,21 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Match header value
     /// - Returns: An If-Match precondition, or nil if parsing fails
     public static func parseIfMatch(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimming(.ascii.whitespaces)
+        let bytes = Array(headerValue.utf8)
+        let trimmed = HTTP.Parse._trimOWS(bytes, 0..<bytes.count)
 
         // Wildcard case
-        if trimmed == "*" {
+        if trimmed.count == 1, bytes[trimmed.lowerBound] == 0x2A {
             return .ifMatch([wildcardTag])
         }
 
         // Parse comma-separated ETags
-        let etags =
-            trimmed
-            .split(separator: ",")
-            .compactMap { HTTP.EntityTag.parse(String($0.trimming(.ascii.whitespaces))) }
+        let items = HTTP.Parse._splitOnComma(bytes)
+        let etags: [HTTP.EntityTag] = items.compactMap { range in
+            let t = HTTP.Parse._trimOWS(bytes, range)
+            guard !t.isEmpty else { return nil }
+            return HTTP.EntityTag.parse(String(decoding: bytes[t], as: UTF8.self))
+        }
 
         return etags.isEmpty ? nil : .ifMatch(etags)
     }
@@ -152,18 +155,21 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-None-Match header value
     /// - Returns: An If-None-Match precondition, or nil if parsing fails
     public static func parseIfNoneMatch(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimming(.ascii.whitespaces)
+        let bytes = Array(headerValue.utf8)
+        let trimmed = HTTP.Parse._trimOWS(bytes, 0..<bytes.count)
 
         // Wildcard case
-        if trimmed == "*" {
+        if trimmed.count == 1, bytes[trimmed.lowerBound] == 0x2A {
             return .ifNoneMatch([wildcardTag])
         }
 
         // Parse comma-separated ETags
-        let etags =
-            trimmed
-            .split(separator: ",")
-            .compactMap { HTTP.EntityTag.parse(String($0.trimming(.ascii.whitespaces))) }
+        let items = HTTP.Parse._splitOnComma(bytes)
+        let etags: [HTTP.EntityTag] = items.compactMap { range in
+            let t = HTTP.Parse._trimOWS(bytes, range)
+            guard !t.isEmpty else { return nil }
+            return HTTP.EntityTag.parse(String(decoding: bytes[t], as: UTF8.self))
+        }
 
         return etags.isEmpty ? nil : .ifNoneMatch(etags)
     }

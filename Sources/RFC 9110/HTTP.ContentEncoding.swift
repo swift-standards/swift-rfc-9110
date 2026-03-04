@@ -82,11 +82,17 @@ extension RFC_9110 {
         /// // [.brotli]
         /// ```
         public static func parse(_ headerValue: String) -> [ContentEncoding] {
-            headerValue
-                .split(separator: ",")
-                .map { $0.trimming(.ascii.whitespaces) }
-                .filter { !$0.isEmpty }
-                .map { ContentEncoding($0) }
+            let bytes = Array(headerValue.utf8)
+            let items = HTTP.Parse._splitOnComma(bytes)
+            var result: [ContentEncoding] = []
+
+            for range in items {
+                let trimmed = HTTP.Parse._trimOWS(bytes, range)
+                guard !trimmed.isEmpty else { continue }
+                result.append(ContentEncoding(String(decoding: bytes[trimmed], as: UTF8.self)))
+            }
+
+            return result
         }
 
         /// Formats multiple encodings as a header value
