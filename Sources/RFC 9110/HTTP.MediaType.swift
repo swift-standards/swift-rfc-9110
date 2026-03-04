@@ -8,6 +8,7 @@
 // Media types for HTTP content negotiation
 
 import ASCII
+import Parser_Primitives
 import Standard_Library_Extensions
 
 extension RFC_9110 {
@@ -99,44 +100,8 @@ extension RFC_9110 {
         /// // mt?.parameters["charset"] == "utf-8"
         /// ```
         public static func parse(_ string: String) -> MediaType? {
-            let bytes = Array(string.utf8)
-            var i = 0
-
-            // Skip leading OWS
-            HTTP.Parse._skipOWS(bytes, &i)
-
-            // Parse type (token)
-            guard let type = HTTP.Parse._token(bytes, &i) else { return nil }
-
-            // Expect "/"
-            guard i < bytes.count, bytes[i] == 0x2F else { return nil }
-            i &+= 1
-
-            // Parse subtype (token)
-            guard let subtype = HTTP.Parse._token(bytes, &i) else { return nil }
-
-            // Parse parameters: *( OWS ";" OWS parameter )
-            var parameters: [String: String] = [:]
-            while i < bytes.count {
-                HTTP.Parse._skipOWS(bytes, &i)
-                guard i < bytes.count, bytes[i] == 0x3B else { break }
-                i &+= 1
-                HTTP.Parse._skipOWS(bytes, &i)
-
-                // parameter-name (token)
-                guard let name = HTTP.Parse._token(bytes, &i) else { break }
-
-                // "="
-                guard i < bytes.count, bytes[i] == 0x3D else { break }
-                i &+= 1
-
-                // parameter-value (token / quoted-string)
-                guard let value = HTTP.Parse._tokenOrQuotedString(bytes, &i) else { break }
-
-                parameters[name.lowercased()] = value
-            }
-
-            return MediaType(type, subtype, parameters: parameters)
+            var input = Parser_Primitives.Parser.ByteInput(utf8: string)
+            return try? Parser<Parser_Primitives.Parser.ByteInput>().parse(&input)
         }
 
         // MARK: - Matching
