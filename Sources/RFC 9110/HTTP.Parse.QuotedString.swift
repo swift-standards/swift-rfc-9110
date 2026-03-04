@@ -31,7 +31,7 @@ extension HTTP.Parse.QuotedString {
 }
 
 extension HTTP.Parse.QuotedString: Parser.`Protocol` {
-    public typealias ParseOutput = [UInt8]
+    public typealias Output = [UInt8]
     public typealias Failure = HTTP.Parse.QuotedString<Input>.Error
 
     @inlinable

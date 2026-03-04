@@ -21,7 +21,7 @@ extension HTTP.Parse {
 }
 
 extension HTTP.Parse.ParameterList: Parser.`Protocol` {
-    public typealias ParseOutput = [(name: Input, value: [UInt8])]
+    public typealias Output = [(name: Input, value: [UInt8])]
     public typealias Failure = Never
 
     @inlinable

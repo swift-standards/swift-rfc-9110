@@ -28,7 +28,7 @@ extension HTTP.Parse {
 }
 
 extension HTTP.Parse.CommaSeparated: Parser.`Protocol` {
-    public typealias ParseOutput = [T]
+    public typealias Output = [T]
     public typealias Failure = Never
 
     @inlinable

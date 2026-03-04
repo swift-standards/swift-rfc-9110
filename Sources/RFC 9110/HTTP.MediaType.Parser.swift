@@ -35,7 +35,7 @@ extension HTTP.MediaType.Parser {
 }
 
 extension HTTP.MediaType.Parser: Parser_Primitives.Parser.`Protocol` {
-    public typealias ParseOutput = HTTP.MediaType
+    public typealias Output = HTTP.MediaType
     public typealias Failure = HTTP.MediaType.Parser<Input>.Error
 
     @inlinable

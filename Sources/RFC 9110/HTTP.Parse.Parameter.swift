@@ -32,7 +32,7 @@ extension HTTP.Parse.Parameter {
 }
 
 extension HTTP.Parse.Parameter: Parser.`Protocol` {
-    public typealias ParseOutput = (name: Input, value: [UInt8])
+    public typealias Output = (name: Input, value: [UInt8])
     public typealias Failure = HTTP.Parse.Parameter<Input>.Error
 
     @inlinable

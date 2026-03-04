@@ -31,7 +31,7 @@ extension HTTP.Parse.QualityValue {
 }
 
 extension HTTP.Parse.QualityValue: Parser.`Protocol` {
-    public typealias ParseOutput = Int
+    public typealias Output = Int
     public typealias Failure = HTTP.Parse.QualityValue<Input>.Error
 
     @inlinable

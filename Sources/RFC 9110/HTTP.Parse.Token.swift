@@ -27,7 +27,7 @@ extension HTTP.Parse.Token {
 }
 
 extension HTTP.Parse.Token: Parser.`Protocol` {
-    public typealias ParseOutput = Input
+    public typealias Output = Input
     public typealias Failure = HTTP.Parse.Token<Input>.Error
 
     @inlinable

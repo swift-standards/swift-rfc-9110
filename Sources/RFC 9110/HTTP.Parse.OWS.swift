@@ -20,7 +20,7 @@ extension HTTP.Parse {
 }
 
 extension HTTP.Parse.OWS: Parser.`Protocol` {
-    public typealias ParseOutput = Void
+    public typealias Output = Void
     public typealias Failure = Never
 
     @inlinable
