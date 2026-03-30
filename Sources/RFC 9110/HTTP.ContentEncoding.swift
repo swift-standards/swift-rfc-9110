@@ -6,7 +6,7 @@
 //
 // Content coding values indicate an encoding transformation applied to the representation
 
-import ASCII
+import ASCII_Primitives
 import Standard_Library_Extensions
 
 extension RFC_9110 {

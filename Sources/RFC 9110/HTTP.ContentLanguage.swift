@@ -1,7 +1,7 @@
 // HTTP.ContentLanguage.swift
 // swift-rfc-9110
 
-import ASCII
+import ASCII_Primitives
 import Standard_Library_Extensions
 
 extension HTTP {

@@ -1,7 +1,7 @@
 // HTTP.Precondition.swift
 // swift-rfc-9110
 
-import ASCII
+import ASCII_Primitives
 import Parser_Primitives
 public import RFC_5322
 import Standard_Library_Extensions
@@ -208,7 +208,7 @@ extension HTTP.Precondition {
     /// - Parameter headerValue: The If-Range header value
     /// - Returns: An If-Range precondition, or nil if parsing fails
     public static func parseIfRange(_ headerValue: String) -> HTTP.Precondition? {
-        let trimmed = headerValue.trimming(.ascii.whitespaces)
+        let trimmed = String(headerValue.trimming(where: { $0.isWhitespace }))
 
         // Try to parse as ETag first
         if let etag = HTTP.EntityTag.parse(trimmed) {

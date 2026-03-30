@@ -6,7 +6,7 @@
 //
 // HTTP authentication framework
 
-import ASCII
+import ASCII_Primitives
 import Parser_Primitives
 import RFC_4648
 import Standard_Library_Extensions
@@ -264,7 +264,7 @@ extension RFC_9110.Authentication {
         /// - Parameter headerValue: The Authorization header value
         /// - Returns: Credentials if parsing succeeds, nil otherwise
         public static func parse(_ headerValue: String) -> Credentials? {
-            let trimmed = headerValue.trimming(.ascii.whitespaces)
+            let trimmed = String(headerValue.trimming(where: { $0.isWhitespace }))
 
             guard let spaceIndex = trimmed.firstIndex(of: " ") else {
                 return nil
@@ -273,8 +273,8 @@ extension RFC_9110.Authentication {
             let schemeName = String(trimmed[..<spaceIndex])
             let scheme = Scheme(schemeName)
 
-            let token = String(trimmed[trimmed.index(after: spaceIndex)...])
-                .trimming(.ascii.whitespaces)
+            let token = String(String(trimmed[trimmed.index(after: spaceIndex)...])
+                .trimming(where: { $0.isWhitespace }))
 
             return Credentials(scheme: scheme, token: token)
         }

@@ -6,7 +6,7 @@
 //
 // Entity tags (ETags) are used for cache validation and conditional requests
 
-import ASCII
+import ASCII_Primitives
 import Parser_Primitives
 import Standard_Library_Extensions
 
