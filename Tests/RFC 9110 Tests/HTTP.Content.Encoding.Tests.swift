@@ -1,5 +1,5 @@
 import Foundation
-// HTTP.ContentEncoding.Tests.swift
+// HTTP.Content.Encoding.Tests.swift
 // swift-rfc-9110
 
 import Testing
@@ -7,28 +7,28 @@ import Testing
 @testable import RFC_9110
 
 @Suite
-struct `HTTP.ContentEncoding Tests` {
+struct `HTTP.Content.Encoding Tests` {
 
     @Test
     func `Standard encodings`() async throws {
-        #expect(HTTP.ContentEncoding.gzip.value == "gzip")
-        #expect(HTTP.ContentEncoding.deflate.value == "deflate")
-        #expect(HTTP.ContentEncoding.compress.value == "compress")
-        #expect(HTTP.ContentEncoding.brotli.value == "br")
-        #expect(HTTP.ContentEncoding.identity.value == "identity")
+        #expect(HTTP.Content.Encoding.gzip.value == "gzip")
+        #expect(HTTP.Content.Encoding.deflate.value == "deflate")
+        #expect(HTTP.Content.Encoding.compress.value == "compress")
+        #expect(HTTP.Content.Encoding.brotli.value == "br")
+        #expect(HTTP.Content.Encoding.identity.value == "identity")
     }
 
     @Test
     func `Custom encoding`() async throws {
-        let custom = HTTP.ContentEncoding("custom-encoding")
+        let custom = HTTP.Content.Encoding("custom-encoding")
 
         #expect(custom.value == "custom-encoding")
     }
 
     @Test
     func `Case insensitive`() async throws {
-        let upper = HTTP.ContentEncoding("GZIP")
-        let lower = HTTP.ContentEncoding("gzip")
+        let upper = HTTP.Content.Encoding("GZIP")
+        let lower = HTTP.Content.Encoding("gzip")
 
         #expect(upper.value == "gzip")
         #expect(lower.value == "gzip")
@@ -37,7 +37,7 @@ struct `HTTP.ContentEncoding Tests` {
 
     @Test
     func `Parse single encoding`() async throws {
-        let encodings = HTTP.ContentEncoding.parse("gzip")
+        let encodings = HTTP.Content.Encoding.parse("gzip")
 
         #expect(encodings.count == 1)
         #expect(encodings[0] == .gzip)
@@ -45,7 +45,7 @@ struct `HTTP.ContentEncoding Tests` {
 
     @Test
     func `Parse multiple encodings`() async throws {
-        let encodings = HTTP.ContentEncoding.parse("gzip, deflate")
+        let encodings = HTTP.Content.Encoding.parse("gzip, deflate")
 
         #expect(encodings.count == 2)
         #expect(encodings[0] == .gzip)
@@ -54,7 +54,7 @@ struct `HTTP.ContentEncoding Tests` {
 
     @Test
     func `Parse with whitespace`() async throws {
-        let encodings = HTTP.ContentEncoding.parse(" gzip ,  br  ")
+        let encodings = HTTP.Content.Encoding.parse(" gzip ,  br  ")
 
         #expect(encodings.count == 2)
         #expect(encodings[0] == .gzip)
@@ -63,37 +63,37 @@ struct `HTTP.ContentEncoding Tests` {
 
     @Test
     func `Parse empty string`() async throws {
-        let encodings = HTTP.ContentEncoding.parse("")
+        let encodings = HTTP.Content.Encoding.parse("")
 
         #expect(encodings.isEmpty)
     }
 
     @Test
     func `Format header - single`() async throws {
-        let header = HTTP.ContentEncoding.formatHeader([.gzip])
+        let header = HTTP.Content.Encoding.formatHeader([.gzip])
 
         #expect(header == "gzip")
     }
 
     @Test
     func `Format header - multiple`() async throws {
-        let header = HTTP.ContentEncoding.formatHeader([.gzip, .deflate, .brotli])
+        let header = HTTP.Content.Encoding.formatHeader([.gzip, .deflate, .brotli])
 
         #expect(header == "gzip, deflate, br")
     }
 
     @Test
     func `Format header - empty`() async throws {
-        let header = HTTP.ContentEncoding.formatHeader([])
+        let header = HTTP.Content.Encoding.formatHeader([])
 
         #expect(header.isEmpty)
     }
 
     @Test
     func `Equality`() async throws {
-        let gzip1 = HTTP.ContentEncoding.gzip
-        let gzip2 = HTTP.ContentEncoding("gzip")
-        let br = HTTP.ContentEncoding.brotli
+        let gzip1 = HTTP.Content.Encoding.gzip
+        let gzip2 = HTTP.Content.Encoding("gzip")
+        let br = HTTP.Content.Encoding.brotli
 
         #expect(gzip1 == gzip2)
         #expect(gzip1 != br)
@@ -101,7 +101,7 @@ struct `HTTP.ContentEncoding Tests` {
 
     @Test
     func `Hashable`() async throws {
-        var set: Set<HTTP.ContentEncoding> = []
+        var set: Set<HTTP.Content.Encoding> = []
         set.insert(.gzip)
         set.insert(.gzip)  // Duplicate
         set.insert(.brotli)
@@ -114,23 +114,23 @@ struct `HTTP.ContentEncoding Tests` {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
-        let encoding = HTTP.ContentEncoding.gzip
+        let encoding = HTTP.Content.Encoding.gzip
         let encoded = try encoder.encode(encoding)
-        let decoded = try decoder.decode(HTTP.ContentEncoding.self, from: encoded)
+        let decoded = try decoder.decode(HTTP.Content.Encoding.self, from: encoded)
 
         #expect(decoded == encoding)
     }
 
     @Test
     func `Description`() async throws {
-        #expect(HTTP.ContentEncoding.gzip.description == "gzip")
-        #expect(HTTP.ContentEncoding.brotli.description == "br")
+        #expect(HTTP.Content.Encoding.gzip.description == "gzip")
+        #expect(HTTP.Content.Encoding.brotli.description == "br")
     }
 
     @Test
     func `String literal`() async throws {
-        let gzip: HTTP.ContentEncoding = "gzip"
-        let custom: HTTP.ContentEncoding = "custom"
+        let gzip: HTTP.Content.Encoding = "gzip"
+        let custom: HTTP.Content.Encoding = "custom"
 
         #expect(gzip == .gzip)
         #expect(custom.value == "custom")

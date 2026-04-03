@@ -33,14 +33,14 @@ extension HTTP {
         /// Use `[.wildcard]` to match any representation.
         ///
         /// # RFC 9110 Section 13.1.1
-        case ifMatch([HTTP.EntityTag])
+        case ifMatch([HTTP.Entity.Tag])
 
         /// If-None-Match: Only perform the action if the current ETag doesn't match any provided ETags
         ///
         /// Used with GET/HEAD for cache validation. Use `[.wildcard]` to match any representation.
         ///
         /// # RFC 9110 Section 13.1.2
-        case ifNoneMatch([HTTP.EntityTag])
+        case ifNoneMatch([HTTP.Entity.Tag])
 
         /// If-Modified-Since: Only perform the action if modified after the specified date
         ///
@@ -66,12 +66,12 @@ extension HTTP {
 
         /// A validator for If-Range precondition
         public enum Validator: Sendable, Equatable {
-            case etag(HTTP.EntityTag)
+            case etag(HTTP.Entity.Tag)
             case date(RFC_5322.DateTime)
         }
 
         /// Wildcard entity tag for matching any representation
-        public static let wildcardTag = HTTP.EntityTag.strong("*")
+        public static let wildcardTag = HTTP.Entity.Tag.strong("*")
     }
 }
 
@@ -147,8 +147,8 @@ extension HTTP.Precondition {
         }
 
         // Parse comma-separated ETags
-        let etags = HTTP.Parse.CommaSeparated<Parser_Primitives.Parser.Input.Bytes, HTTP.EntityTag> { element in
-            HTTP.EntityTag.parse(String(decoding: element, as: UTF8.self))
+        let etags = HTTP.Parse.CommaSeparated<Parser_Primitives.Parser.Input.Bytes, HTTP.Entity.Tag> { element in
+            HTTP.Entity.Tag.parse(String(decoding: element, as: UTF8.self))
         }.parse(&input)
 
         return etags.isEmpty ? nil : .ifMatch(etags)
@@ -174,8 +174,8 @@ extension HTTP.Precondition {
         }
 
         // Parse comma-separated ETags
-        let etags = HTTP.Parse.CommaSeparated<Parser_Primitives.Parser.Input.Bytes, HTTP.EntityTag> { element in
-            HTTP.EntityTag.parse(String(decoding: element, as: UTF8.self))
+        let etags = HTTP.Parse.CommaSeparated<Parser_Primitives.Parser.Input.Bytes, HTTP.Entity.Tag> { element in
+            HTTP.Entity.Tag.parse(String(decoding: element, as: UTF8.self))
         }.parse(&input)
 
         return etags.isEmpty ? nil : .ifNoneMatch(etags)
@@ -211,7 +211,7 @@ extension HTTP.Precondition {
         let trimmed = String(headerValue.trimming(where: { $0.isWhitespace }))
 
         // Try to parse as ETag first
-        if let etag = HTTP.EntityTag.parse(trimmed) {
+        if let etag = HTTP.Entity.Tag.parse(trimmed) {
             return .ifRange(.etag(etag))
         }
 
@@ -233,7 +233,7 @@ extension HTTP.Precondition {
     ///   - currentETag: The current entity tag of the resource, if any
     ///   - lastModified: The last modified timestamp of the resource, if any
     /// - Returns: true if the precondition is satisfied, false otherwise
-    public func evaluate(currentETag: HTTP.EntityTag?, lastModified: RFC_5322.DateTime?) -> Bool {
+    public func evaluate(currentETag: HTTP.Entity.Tag?, lastModified: RFC_5322.DateTime?) -> Bool {
         switch self {
         case .ifMatch(let etags):
             guard let currentETag = currentETag else {
@@ -244,7 +244,7 @@ extension HTTP.Precondition {
                 return true
             }
             // Check if any ETag matches using strong comparison
-            return etags.contains(where: { HTTP.EntityTag.strongCompare($0, currentETag) })
+            return etags.contains(where: { HTTP.Entity.Tag.strongCompare($0, currentETag) })
 
         case .ifNoneMatch(let etags):
             guard let currentETag = currentETag else {
@@ -256,7 +256,7 @@ extension HTTP.Precondition {
                 return false
             }
             // Check if NO ETag matches using weak comparison
-            return !etags.contains(where: { HTTP.EntityTag.weakCompare($0, currentETag) })
+            return !etags.contains(where: { HTTP.Entity.Tag.weakCompare($0, currentETag) })
 
         case .ifModifiedSince(let date):
             guard let lastModified = lastModified else {
@@ -279,7 +279,7 @@ extension HTTP.Precondition {
                 return false
             }
             // Must use strong comparison for If-Range
-            return HTTP.EntityTag.strongCompare(etag, currentETag)
+            return HTTP.Entity.Tag.strongCompare(etag, currentETag)
 
         case .ifRange(.date(let date)):
             guard let lastModified = lastModified else {

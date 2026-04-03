@@ -22,14 +22,6 @@ extension HTTP.Parse {
     }
 }
 
-extension HTTP.Parse.QuotedString {
-    public enum Error: Swift.Error, Sendable, Equatable {
-        case expectedOpenQuote
-        case unexpectedEndOfInput
-        case invalidEscapeSequence
-    }
-}
-
 extension HTTP.Parse.QuotedString: Parser.`Protocol` {
     public typealias Output = [UInt8]
     public typealias Failure = HTTP.Parse.QuotedString<Input>.Error

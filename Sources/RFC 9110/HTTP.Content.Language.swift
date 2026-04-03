@@ -1,10 +1,10 @@
-// HTTP.ContentLanguage.swift
+// HTTP.Content.Language.swift
 // swift-rfc-9110
 
 import ASCII_Primitives
 import Standard_Library_Extensions
 
-extension HTTP {
+extension RFC_9110.Content {
     /// Content-Language header field (RFC 9110 Section 8.5)
     ///
     /// The "Content-Language" header field describes the natural language(s)
@@ -13,8 +13,8 @@ extension HTTP {
     /// # Example
     ///
     /// ```swift
-    /// let language = HTTP.ContentLanguage("en-US")
-    /// let languages = HTTP.ContentLanguage.parse("en-US, fr-CA")
+    /// let language = HTTP.Content.Language("en-US")
+    /// let languages = HTTP.Content.Language.parse("en-US, fr-CA")
     /// ```
     ///
     /// # RFC 9110 Section 8.5
@@ -25,7 +25,7 @@ extension HTTP {
     ///
     /// Language tags are defined in [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646.html).
     ///
-    public struct ContentLanguage: Sendable, Equatable, Hashable {
+    public struct Language: Sendable, Equatable, Hashable {
         /// The language tag (e.g., "en", "en-US", "fr-CA")
         public let tag: String
 
@@ -39,22 +39,22 @@ extension HTTP {
 
         // MARK: - Header Parsing
 
-        /// Parses a Content-Language header value into an array of ContentLanguage values
+        /// Parses a Content-Language header value into an array of Language values
         ///
         /// - Parameter headerValue: The Content-Language header value (e.g., "en-US, fr-CA")
-        /// - Returns: An array of ContentLanguage values
+        /// - Returns: An array of Language values
         ///
         /// # Example
         ///
         /// ```swift
-        /// let languages = HTTP.ContentLanguage.parse("en-US, fr-CA")
-        /// // [ContentLanguage("en-us"), ContentLanguage("fr-ca")]
+        /// let languages = RFC_9110.Content.Language.parse("en-US, fr-CA")
+        /// // [Language("en-us"), Language("fr-ca")]
         /// ```
-        public static func parse(_ headerValue: String) -> [ContentLanguage] {
-            HTTP.Parse.tokens(in: headerValue).map { ContentLanguage($0) }
+        public static func parse(_ headerValue: String) -> [Language] {
+            HTTP.Parse.tokens(in: headerValue).map { Language($0) }
         }
 
-        /// Formats an array of ContentLanguage values into a header value
+        /// Formats an array of Language values into a header value
         ///
         /// - Parameter languages: The languages to format
         /// - Returns: A Content-Language header value
@@ -62,10 +62,10 @@ extension HTTP {
         /// # Example
         ///
         /// ```swift
-        /// let header = HTTP.ContentLanguage.formatHeader([.englishUS, .frenchCA])
+        /// let header = RFC_9110.Content.Language.formatHeader([.englishUS, .frenchCA])
         /// // "en-us, fr-ca"
         /// ```
-        public static func formatHeader(_ languages: [ContentLanguage]) -> String {
+        public static func formatHeader(_ languages: [Language]) -> String {
             return
                 languages
                 .map { $0.tag }
@@ -76,7 +76,7 @@ extension HTTP {
 
 // MARK: - Codable
 
-extension HTTP.ContentLanguage: Codable {
+extension RFC_9110.Content.Language: Codable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let tag = try container.decode(String.self)
@@ -91,7 +91,7 @@ extension HTTP.ContentLanguage: Codable {
 
 // MARK: - CustomStringConvertible
 
-extension HTTP.ContentLanguage: CustomStringConvertible {
+extension RFC_9110.Content.Language: CustomStringConvertible {
     public var description: String {
         return tag
     }
@@ -99,7 +99,7 @@ extension HTTP.ContentLanguage: CustomStringConvertible {
 
 // MARK: - ExpressibleByStringLiteral
 
-extension HTTP.ContentLanguage: ExpressibleByStringLiteral {
+extension RFC_9110.Content.Language: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self.init(value)
     }
@@ -107,7 +107,7 @@ extension HTTP.ContentLanguage: ExpressibleByStringLiteral {
 
 // MARK: - Common Language Tags
 
-extension HTTP.ContentLanguage {
+extension RFC_9110.Content.Language {
     /// English
     public static let english = Self("en")
 

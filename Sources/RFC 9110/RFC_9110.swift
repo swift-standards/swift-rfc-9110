@@ -14,7 +14,7 @@
 // - HTTP.Request - HTTP request message
 // - HTTP.Response - HTTP response message
 // - HTTP.MediaType - Media type handling
-// - HTTP.ContentNegotiation - Content negotiation
+// - HTTP.Content.Negotiation - Content negotiation
 
 import RFC_3986
 

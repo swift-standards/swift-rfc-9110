@@ -20,12 +20,6 @@ extension HTTP.Parse {
     }
 }
 
-extension HTTP.Parse.Token {
-    public enum Error: Swift.Error, Sendable, Equatable {
-        case expectedToken
-    }
-}
-
 extension HTTP.Parse.Token: Parser.`Protocol` {
     public typealias Output = Input
     public typealias Failure = HTTP.Parse.Token<Input>.Error

@@ -1,4 +1,4 @@
-// HTTP.ContentEncoding.swift
+// HTTP.Content.Encoding.swift
 // swift-rfc-9110
 //
 // RFC 9110 Section 8.4: Content-Encoding
@@ -9,7 +9,7 @@
 import ASCII_Primitives
 import Standard_Library_Extensions
 
-extension RFC_9110 {
+extension RFC_9110.Content {
     /// HTTP Content Encoding (RFC 9110 Section 8.4)
     ///
     /// Content-Encoding indicates what encoding transformations have been
@@ -19,15 +19,15 @@ extension RFC_9110 {
     /// ## Example Usage
     ///
     /// ```swift
-    /// let gzip = HTTP.ContentEncoding.gzip
-    /// let br = HTTP.ContentEncoding.brotli
-    /// let custom = HTTP.ContentEncoding("custom-encoding")
+    /// let gzip = HTTP.Content.Encoding.gzip
+    /// let br = HTTP.Content.Encoding.brotli
+    /// let custom = HTTP.Content.Encoding("custom-encoding")
     ///
     /// // Header value
     /// print(gzip.value) // "gzip"
     ///
     /// // Parsing
-    /// let parsed = HTTP.ContentEncoding.parse("gzip, deflate")
+    /// let parsed = HTTP.Content.Encoding.parse("gzip, deflate")
     /// // [.gzip, .deflate]
     /// ```
     ///
@@ -51,7 +51,7 @@ extension RFC_9110 {
     ///
     /// - [RFC 9110 Section 8.4: Content-Encoding](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.4)
     /// - [RFC 9110 Section 8.4.1: Content Codings](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.4.1)
-    public struct ContentEncoding: Sendable, Equatable, Hashable, Codable {
+    public struct Encoding: Sendable, Equatable, Hashable, Codable {
         /// The encoding name (case-insensitive token)
         public let value: String
 
@@ -72,17 +72,17 @@ extension RFC_9110 {
         /// ## Example
         ///
         /// ```swift
-        /// ContentEncoding.parse("gzip")
+        /// Encoding.parse("gzip")
         /// // [.gzip]
         ///
-        /// ContentEncoding.parse("gzip, deflate")
+        /// Encoding.parse("gzip, deflate")
         /// // [.gzip, .deflate]
         ///
-        /// ContentEncoding.parse("br")
+        /// Encoding.parse("br")
         /// // [.brotli]
         /// ```
-        public static func parse(_ headerValue: String) -> [ContentEncoding] {
-            HTTP.Parse.tokens(in: headerValue).map { ContentEncoding($0) }
+        public static func parse(_ headerValue: String) -> [Encoding] {
+            HTTP.Parse.tokens(in: headerValue).map { Encoding($0) }
         }
 
         /// Formats multiple encodings as a header value
@@ -93,10 +93,10 @@ extension RFC_9110 {
         /// ## Example
         ///
         /// ```swift
-        /// ContentEncoding.formatHeader([.gzip, .deflate])
+        /// Encoding.formatHeader([.gzip, .deflate])
         /// // "gzip, deflate"
         /// ```
-        public static func formatHeader(_ encodings: [ContentEncoding]) -> String {
+        public static func formatHeader(_ encodings: [Encoding]) -> String {
             encodings.map(\.value).joined(separator: ", ")
         }
     }
@@ -104,7 +104,7 @@ extension RFC_9110 {
 
 // MARK: - CustomStringConvertible
 
-extension RFC_9110.ContentEncoding: CustomStringConvertible {
+extension RFC_9110.Content.Encoding: CustomStringConvertible {
     public var description: String {
         value
     }
@@ -112,7 +112,7 @@ extension RFC_9110.ContentEncoding: CustomStringConvertible {
 
 // MARK: - Codable
 
-extension RFC_9110.ContentEncoding {
+extension RFC_9110.Content.Encoding {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let value = try container.decode(String.self)
@@ -127,7 +127,7 @@ extension RFC_9110.ContentEncoding {
 
 // MARK: - ExpressibleByStringLiteral
 
-extension RFC_9110.ContentEncoding: ExpressibleByStringLiteral {
+extension RFC_9110.Content.Encoding: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self.init(value)
     }
@@ -135,7 +135,7 @@ extension RFC_9110.ContentEncoding: ExpressibleByStringLiteral {
 
 // MARK: - Standard Encodings
 
-extension RFC_9110.ContentEncoding {
+extension RFC_9110.Content.Encoding {
     /// GZIP compression (RFC 1952)
     ///
     /// Format using LZ77 and Huffman coding.

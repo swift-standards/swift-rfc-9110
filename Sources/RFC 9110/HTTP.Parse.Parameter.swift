@@ -22,15 +22,6 @@ extension HTTP.Parse {
     }
 }
 
-extension HTTP.Parse.Parameter {
-    public enum Error: Swift.Error, Sendable, Equatable {
-        case expectedToken
-        case expectedEquals
-        case expectedValue
-        case invalidQuotedString(HTTP.Parse.QuotedString<Input>.Error)
-    }
-}
-
 extension HTTP.Parse.Parameter: Parser.`Protocol` {
     public typealias Output = (name: Input, value: [UInt8])
     public typealias Failure = HTTP.Parse.Parameter<Input>.Error

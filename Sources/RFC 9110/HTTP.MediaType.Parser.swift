@@ -26,14 +26,6 @@ extension HTTP.MediaType {
     }
 }
 
-extension HTTP.MediaType.Parser {
-    public enum Error: Swift.Error, Sendable, Equatable {
-        case expectedType
-        case expectedSlash
-        case expectedSubtype
-    }
-}
-
 extension HTTP.MediaType.Parser: Parser_Primitives.Parser.`Protocol` {
     public typealias Output = HTTP.MediaType
     public typealias Failure = HTTP.MediaType.Parser<Input>.Error

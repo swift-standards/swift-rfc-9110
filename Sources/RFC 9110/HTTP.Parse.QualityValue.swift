@@ -22,14 +22,6 @@ extension HTTP.Parse {
     }
 }
 
-extension HTTP.Parse.QualityValue {
-    public enum Error: Swift.Error, Sendable, Equatable {
-        case expectedSemicolon
-        case expectedQ
-        case invalidQValue
-    }
-}
-
 extension HTTP.Parse.QualityValue: Parser.`Protocol` {
     public typealias Output = Int
     public typealias Failure = HTTP.Parse.QualityValue<Input>.Error

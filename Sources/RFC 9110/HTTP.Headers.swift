@@ -43,10 +43,10 @@ extension RFC_9110 {
     /// - [RFC 9110 Section 5.2: Field Order](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.2)
     public struct Headers: Sendable, Equatable, Hashable, Codable {
         // Internal storage: maps header name -> list of values
-        private var storage: [Header.Field.Name: [Header.Field.Value]]
+        var storage: [Header.Field.Name: [Header.Field.Value]]
 
         // Ordered list of names to preserve insertion order
-        private var orderedNames: [Header.Field.Name]
+        var orderedNames: [Header.Field.Name]
 
         /// Creates a headers collection from an array of fields
         ///
@@ -146,59 +146,6 @@ extension RFC_9110 {
         public func contains(_ name: String) -> Bool {
             storage[Header.Field.Name(name)] != nil
         }
-    }
-}
-
-// MARK: - Sequence
-
-extension RFC_9110.Headers: Sequence {
-    /// Iterator for Headers collection
-    ///
-    /// Iterates over all header fields, expanding headers with multiple
-    /// values into separate Field instances while preserving order.
-    public struct Iterator: IteratorProtocol {
-        private var nameIndex = 0
-        private var valueIndex = 0
-        private let orderedNames: [RFC_9110.Header.Field.Name]
-        private let storage: [RFC_9110.Header.Field.Name: [RFC_9110.Header.Field.Value]]
-
-        fileprivate init(
-            orderedNames: [RFC_9110.Header.Field.Name],
-            storage: [RFC_9110.Header.Field.Name: [RFC_9110.Header.Field.Value]]
-        ) {
-            self.orderedNames = orderedNames
-            self.storage = storage
-        }
-
-        public mutating func next() -> RFC_9110.Header.Field? {
-            guard nameIndex < orderedNames.count else { return nil }
-
-            let name = orderedNames[nameIndex]
-            let values = storage[name]!
-
-            guard valueIndex < values.count else {
-                nameIndex += 1
-                valueIndex = 0
-                return next()
-            }
-
-            let value = values[valueIndex]
-            valueIndex += 1
-
-            return RFC_9110.Header.Field(name: name, value: value)
-        }
-    }
-
-    /// Iterates over all header fields (expanding headers with multiple values)
-    ///
-    /// ## Example
-    /// ```swift
-    /// for header in headers {
-    ///     print("\(header.name): \(header.value)")
-    /// }
-    /// ```
-    public func makeIterator() -> Iterator {
-        Iterator(orderedNames: orderedNames, storage: storage)
     }
 }
 

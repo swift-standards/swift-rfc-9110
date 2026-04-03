@@ -1,4 +1,4 @@
-// HTTP.EntityTag.swift
+// HTTP.Entity.Tag.swift
 // swift-rfc-9110
 //
 // RFC 9110 Section 8.8.3: ETag
@@ -10,7 +10,7 @@ import ASCII_Primitives
 import Parser_Primitives
 import Standard_Library_Extensions
 
-extension RFC_9110 {
+extension RFC_9110.Entity {
     /// HTTP Entity Tag (ETag) per RFC 9110 Section 8.8.3
     ///
     /// An entity tag (ETag) is an opaque validator for differentiating between
@@ -30,15 +30,15 @@ extension RFC_9110 {
     ///
     /// ```swift
     /// // Strong ETag
-    /// let strong = HTTP.EntityTag(value: "686897696a7c876b7e", isWeak: false)
+    /// let strong = HTTP.Entity.Tag(value: "686897696a7c876b7e", isWeak: false)
     /// print(strong.headerValue) // "686897696a7c876b7e"
     ///
     /// // Weak ETag
-    /// let weak = HTTP.EntityTag(value: "686897696a7c876b7e", isWeak: true)
+    /// let weak = HTTP.Entity.Tag(value: "686897696a7c876b7e", isWeak: true)
     /// print(weak.headerValue) // W/"686897696a7c876b7e"
     ///
     /// // Parsing
-    /// let parsed = HTTP.EntityTag.parse("W/\"686897696a7c876b7e\"")
+    /// let parsed = HTTP.Entity.Tag.parse("W/\"686897696a7c876b7e\"")
     /// // parsed?.value == "686897696a7c876b7e"
     /// // parsed?.isWeak == true
     /// ```
@@ -58,7 +58,7 @@ extension RFC_9110 {
     ///
     /// - [RFC 9110 Section 8.8.3: ETag](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.3)
     /// - [RFC 9110 Section 13.1: Validators](https://www.rfc-editor.org/rfc/rfc9110.html#section-13.1)
-    public struct EntityTag: Sendable, Equatable, Hashable, Codable {
+    public struct Tag: Sendable, Equatable, Hashable, Codable {
         /// The opaque tag value (without quotes)
         public let value: String
 
@@ -85,8 +85,8 @@ extension RFC_9110 {
         /// ## Examples
         ///
         /// ```swift
-        /// EntityTag.strong("abc").headerValue  // "abc"
-        /// EntityTag.weak("abc").headerValue    // W/"abc"
+        /// Entity.Tag.strong("abc").headerValue  // "abc"
+        /// Entity.Tag.weak("abc").headerValue    // W/"abc"
         /// ```
         public var headerValue: String {
             if isWeak {
@@ -99,16 +99,16 @@ extension RFC_9110 {
         /// Parses an entity tag from a header value
         ///
         /// - Parameter headerValue: The ETag header value to parse
-        /// - Returns: An EntityTag if parsing succeeds, nil otherwise
+        /// - Returns: A Tag if parsing succeeds, nil otherwise
         ///
         /// ## Example
         ///
         /// ```swift
-        /// EntityTag.parse("\"abc123\"")        // EntityTag(value: "abc123", isWeak: false)
-        /// EntityTag.parse("W/\"abc123\"")      // EntityTag(value: "abc123", isWeak: true)
-        /// EntityTag.parse("invalid")           // nil
+        /// Entity.Tag.parse("\"abc123\"")        // Entity.Tag(value: "abc123", isWeak: false)
+        /// Entity.Tag.parse("W/\"abc123\"")      // Entity.Tag(value: "abc123", isWeak: true)
+        /// Entity.Tag.parse("invalid")           // nil
         /// ```
-        public static func parse(_ headerValue: String) -> EntityTag? {
+        public static func parse(_ headerValue: String) -> Tag? {
             var input = Parser_Primitives.Parser.Input.Bytes(utf8: headerValue)
 
             // OWS
@@ -129,14 +129,14 @@ extension RFC_9110 {
                 return nil
             }
 
-            return EntityTag(value: String(decoding: bytes, as: UTF8.self), isWeak: isWeak)
+            return Tag(value: String(decoding: bytes, as: UTF8.self), isWeak: isWeak)
         }
     }
 }
 
 // MARK: - CustomStringConvertible
 
-extension RFC_9110.EntityTag: CustomStringConvertible {
+extension RFC_9110.Entity.Tag: CustomStringConvertible {
     public var description: String {
         headerValue
     }
@@ -144,12 +144,12 @@ extension RFC_9110.EntityTag: CustomStringConvertible {
 
 // MARK: - Codable
 
-extension RFC_9110.EntityTag {
+extension RFC_9110.Entity.Tag {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let string = try container.decode(String.self)
 
-        guard let entityTag = RFC_9110.EntityTag.parse(string) else {
+        guard let entityTag = RFC_9110.Entity.Tag.parse(string) else {
             throw DecodingError.dataCorruptedError(
                 in: container,
                 debugDescription: "Invalid entity tag: \(string)"
@@ -167,7 +167,7 @@ extension RFC_9110.EntityTag {
 
 // MARK: - LosslessStringConvertible
 
-extension RFC_9110.EntityTag: LosslessStringConvertible {
+extension RFC_9110.Entity.Tag: LosslessStringConvertible {
     /// Creates an entity tag from a string description
     ///
     /// - Parameter description: The ETag string (e.g., `"abc123"`, `W/"abc123"`)
@@ -176,7 +176,7 @@ extension RFC_9110.EntityTag: LosslessStringConvertible {
     /// # Example
     ///
     /// ```swift
-    /// let etag = HTTP.EntityTag("\"abc123\"")  // Strong ETag
+    /// let etag = HTTP.Entity.Tag("\"abc123\"")  // Strong ETag
     /// let str = String(etag)                   // "\"abc123\"" - perfect round-trip
     /// ```
     public init?(_ description: String) {
@@ -187,20 +187,20 @@ extension RFC_9110.EntityTag: LosslessStringConvertible {
 
 // MARK: - ExpressibleByStringLiteral
 
-extension RFC_9110.EntityTag: ExpressibleByStringLiteral {
+extension RFC_9110.Entity.Tag: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
-        if let parsed = RFC_9110.EntityTag.parse(value) {
+        if let parsed = RFC_9110.Entity.Tag.parse(value) {
             self = parsed
         } else {
             // Fallback: treat as strong ETag with the literal value
-            self = RFC_9110.EntityTag(value: value, isWeak: false)
+            self = RFC_9110.Entity.Tag(value: value, isWeak: false)
         }
     }
 }
 
 // MARK: - Factory Methods and Comparison
 
-extension RFC_9110.EntityTag {
+extension RFC_9110.Entity.Tag {
     /// Creates a strong entity tag
     ///
     /// - Parameter value: The opaque tag value
