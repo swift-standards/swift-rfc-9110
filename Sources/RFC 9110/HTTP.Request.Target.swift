@@ -198,29 +198,6 @@ extension RFC_9110.Request {
             }
         }
 
-        /// Returns true if this is origin-form
-        public var isOriginForm: Bool {
-            if case .origin = self { return true }
-            return false
-        }
-
-        /// Returns true if this is absolute-form
-        public var isAbsoluteForm: Bool {
-            if case .absolute = self { return true }
-            return false
-        }
-
-        /// Returns true if this is authority-form
-        public var isAuthorityForm: Bool {
-            if case .authority = self { return true }
-            return false
-        }
-
-        /// Returns true if this is asterisk-form
-        public var isAsteriskForm: Bool {
-            if case .asterisk = self { return true }
-            return false
-        }
     }
 }
 

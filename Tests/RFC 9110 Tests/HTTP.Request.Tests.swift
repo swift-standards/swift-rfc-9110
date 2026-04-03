@@ -18,8 +18,8 @@ struct `HTTP.Request.Target Tests` {
         )
 
         #expect(target.rawValue == "/users/123?page=1&limit=10")
-        #expect(target.isOriginForm == true)
-        #expect(target.isAbsoluteForm == false)
+        #expect(target.form.isOrigin == true)
+        #expect(target.form.isAbsolute == false)
         #expect(target.path?.description == "/users/123")
         #expect(target.query?.string == "page=1&limit=10")
     }
@@ -41,8 +41,8 @@ struct `HTTP.Request.Target Tests` {
         let target = HTTP.Request.Target.absolute(uri)
 
         #expect(target.rawValue == "http://example.com/users?page=1")
-        #expect(target.isAbsoluteForm == true)
-        #expect(target.isOriginForm == false)
+        #expect(target.form.isAbsolute == true)
+        #expect(target.form.isOrigin == false)
     }
 
     @Test
@@ -54,8 +54,8 @@ struct `HTTP.Request.Target Tests` {
         )
         let target = HTTP.Request.Target.authority(authority)
 
-        #expect(target.isAuthorityForm == true)
-        #expect(target.isOriginForm == false)
+        #expect(target.form.isAuthority == true)
+        #expect(target.form.isOrigin == false)
     }
 
     @Test
@@ -63,7 +63,7 @@ struct `HTTP.Request.Target Tests` {
         let target = HTTP.Request.Target.asterisk
 
         #expect(target.rawValue == "*")
-        #expect(target.isAsteriskForm == true)
+        #expect(target.form.isAsterisk == true)
         #expect(target.path == nil)
         #expect(target.query == nil)
     }
@@ -131,7 +131,7 @@ struct `HTTP.Request Tests` {
         )
 
         #expect(request.method == .get)
-        #expect(request.target.isAbsoluteForm == true)
+        #expect(request.target.form.isAbsolute == true)
         #expect(request.path?.description == "/v1/users")
         #expect(request.query?.string == "page=1")
     }
